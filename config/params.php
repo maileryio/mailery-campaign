@@ -44,7 +44,7 @@ return [
             'items' => [
                 'campaigns' => (new MenuItem())
                     ->withLabel('Campaigns')
-                    ->withIcon('rocket')
+                    ->withIcon('campaign')
                     ->withChildItems([
                         'campaigns' => (new MenuItem())
                             ->withLabel('All Campaigns')
