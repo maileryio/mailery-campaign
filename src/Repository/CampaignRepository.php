@@ -8,7 +8,7 @@ use Cycle\ORM\Select\QueryBuilder;
 use Cycle\ORM\Select\Repository;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Campaign\Entity\Campaign;
-use Mailery\Widget\Search\Data\Reader\SelectDataReader;
+use Yiisoft\Yii\Cycle\DataReader\SelectDataReader;
 
 class CampaignRepository extends Repository
 {
