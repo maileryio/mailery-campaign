@@ -61,7 +61,7 @@ final class CampaignService
 
         return new OffsetPaginator(
             $dataReader->withSort(
-                (new Sort([]))->withOrderString('name')
+                (new Sort([]))->withOrder(['id' => 'DESC'])
             )
         );
     }
