@@ -9,6 +9,10 @@ use Cycle\ORM\Select\Repository;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Campaign\Entity\Campaign;
 use Yiisoft\Yii\Cycle\DataReader\SelectDataReader;
+use Mailery\Campaign\Filter\CampaignFilter;
+use Yiisoft\Data\Paginator\OffsetPaginator;
+use Yiisoft\Data\Reader\Sort;
+use Yiisoft\Data\Paginator\PaginatorInterface;
 
 class CampaignRepository extends Repository
 {
@@ -20,6 +24,25 @@ class CampaignRepository extends Repository
     public function getDataReader(array $scope = [], array $orderBy = []): SelectDataReader
     {
         return new SelectDataReader($this->select()->where($scope)->orderBy($orderBy));
+    }
+
+    /**
+     * @param CampaignFilter $filter
+     * @return PaginatorInterface
+     */
+    public function getFullPaginator(CampaignFilter $filter): PaginatorInterface
+    {
+        $dataReader = $this->getDataReader();
+
+        if (!$filter->isEmpty()) {
+            $dataReader = $dataReader->withFilter($filter);
+        }
+
+        return new OffsetPaginator(
+            $dataReader->withSort(
+                (new Sort([]))->withOrder(['id' => 'DESC'])
+            )
+        );
     }
 
     /**

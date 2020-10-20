@@ -35,10 +35,21 @@ $this->setTitle('All campaigns');
                         ->label('Activity log')
                         ->module(Module::NAME); ?>
                 </b-dropdown>
-                <a class="btn btn-sm btn-primary mx-sm-1 mb-2" href="<?= $urlGenerator->generate('/campaign/campaign/create'); ?>">
-                    <?= Icon::widget()->name('plus')->options(['class' => 'mr-1']); ?>
-                    Add new campaign
-                </a>
+                <b-dropdown right size="sm" variant="primary" class="mx-sm-1 mb-2">
+                    <template v-slot:button-content>
+                        <?= Icon::widget()->name('plus')->options(['class' => 'mr-1']); ?>
+                        Add new campaign
+                    </template>
+                    <?php foreach ($campaignTypes as $campaignType) {
+                        echo Html::tag(
+                            'b-dropdown-item',
+                            $campaignType->getShortLabel(),
+                            [
+                                'href' => $urlGenerator->generate($campaignType->getCreateRouteName(), $campaignType->getCreateRouteParams()),
+                            ]
+                        );
+                    } ?>
+                </b-dropdown>
             </div>
         </div>
     </div>

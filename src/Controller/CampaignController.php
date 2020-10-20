@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Mailery\Campaign\Controller;
 
-use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Form\CampaignForm;
 use Mailery\Campaign\Repository\CampaignRepository;
-use Mailery\Campaign\Service\CampaignService;
 use Mailery\Widget\Search\Form\SearchForm;
+use Mailery\Widget\Search\Model\SearchByList;
+use Mailery\Campaign\Search\CampaignSearchBy;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Yiisoft\Router\UrlGeneratorInterface as UrlGenerator;
 use Yiisoft\Yii\View\ViewRenderer;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
+use Mailery\Campaign\Model\CampaignTypeList;
+use Mailery\Campaign\Filter\CampaignFilter;
 
 class CampaignController
 {
@@ -55,25 +57,31 @@ class CampaignController
 
     /**
      * @param Request $request
-     * @param CampaignService $campaignService
+     * @param CampaignTypeList $campaignTypes
      * @return Response
      */
-    public function index(Request $request, CampaignService $campaignService): Response
+    public function index(Request $request, CampaignTypeList $campaignTypes): Response
     {
         $queryParams = $request->getQueryParams();
         $pageNum = (int) ($queryParams['page'] ?? 1);
         $searchBy = $queryParams['searchBy'] ?? null;
         $searchPhrase = $queryParams['search'] ?? null;
 
-        $searchForm = $campaignService->getSearchForm()
+        $searchForm = (new SearchForm())
+            ->withSearchByList(new SearchByList([
+                new CampaignSearchBy(),
+            ]))
             ->withSearchBy($searchBy)
             ->withSearchPhrase($searchPhrase);
 
-        $paginator = $campaignService->getFullPaginator($searchForm->getSearchBy())
+        $filter = (new CampaignFilter())
+            ->withSearchForm($searchForm);
+
+        $paginator = $this->campaignRepo->getFullPaginator($filter)
             ->withPageSize(self::PAGINATION_INDEX)
             ->withCurrentPage($pageNum);
 
-        return $this->viewRenderer->render('index', compact('searchForm', 'paginator'));
+        return $this->viewRenderer->render('index', compact('searchForm', 'paginator', 'campaignTypes'));
     }
 
     /**
@@ -110,11 +118,10 @@ class CampaignController
 
     /**
      * @param Request $request
-     * @param CampaignService $campaignService
      * @param UrlGenerator $urlGenerator
      * @return Response
      */
-    public function delete(Request $request, CampaignService $campaignService, UrlGenerator $urlGenerator): Response
+    public function delete(Request $request, UrlGenerator $urlGenerator): Response
     {
         ;
     }

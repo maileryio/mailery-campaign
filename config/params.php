@@ -15,6 +15,10 @@ use Opis\Closure\SerializableClosure;
 use Yiisoft\Router\UrlGeneratorInterface;
 
 return [
+    'maileryio/mailery-campaign' => [
+        'types' => [],
+    ],
+
     'yiisoft/yii-cycle' => [
         'annotated-entity-paths' => [
             '@vendor/maileryio/mailery-campaign/src/Entity',
