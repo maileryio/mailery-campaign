@@ -6,7 +6,7 @@ use Mailery\Campaign\Repository\CampaignRepository;
 use Psr\Container\ContainerInterface;
 use Cycle\ORM\ORMInterface;
 use Mailery\Campaign\Entity\Campaign;
-use Mailery\Template\Provider\CampaignTypeConfigs;
+use Mailery\Campaign\Provider\CampaignTypeConfigs;
 
 return [
     CampaignTypeConfigs::class => static function () use ($params) {

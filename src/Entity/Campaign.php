@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace Mailery\Campaign\Entity;
 
-use Mailery\Activity\Log\Entity\LoggableEntityInterface;
-use Mailery\Activity\Log\Entity\LoggableEntityTrait;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Common\Entity\RoutableEntityInterface;
 
@@ -24,10 +22,8 @@ use Mailery\Common\Entity\RoutableEntityInterface;
  *      mapper = "Mailery\Campaign\Mapper\DefaultMapper"
  * )
  */
-class Campaign implements RoutableEntityInterface, LoggableEntityInterface
+class Campaign implements RoutableEntityInterface
 {
-    use LoggableEntityTrait;
-
     /**
      * @Cycle\Annotated\Annotation\Column(type = "primary")
      * @var int|null
