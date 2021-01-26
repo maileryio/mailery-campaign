@@ -75,7 +75,7 @@ $this->setTitle('All campaigns');
                     ->content(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
                             $data->getName(),
-                            $urlGenerator->generate('/campaign/campaign/view', ['id' => $data->getId()])
+                            $urlGenerator->generate('/campaign/default/view', ['id' => $data->getId()])
                         );
                     }),
                 (new ActionColumn())
@@ -87,7 +87,7 @@ $this->setTitle('All campaigns');
                     ->update(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
                             (string) Icon::widget()->name('pencil'),
-                            $urlGenerator->generate('/campaign/campaign/edit', ['id' => $data->getId()]),
+                            $urlGenerator->generate('/campaign/default/edit', ['id' => $data->getId()]),
                             [
                                 'class' => 'text-decoration-none mr-3',
                             ]
@@ -105,7 +105,7 @@ $this->setTitle('All campaigns');
                         return Link::widget()
                             ->label((string) Icon::widget()->name('delete')->options(['class' => 'mr-1']))
                             ->method('delete')
-                            ->href($urlGenerator->generate('/campaign/campaign/delete', ['id' => $data->getId()]))
+                            ->href($urlGenerator->generate('/campaign/default/delete', ['id' => $data->getId()]))
                             ->confirm('Are you sure?')
                             ->options([
                                 'class' => 'text-decoration-none text-danger',
@@ -131,7 +131,7 @@ if ($paginator->getTotalItems() > 0) {
                 ->prevPageLabel('Previous')
                 ->nextPageLabel('Next')
                 ->urlGenerator(function (int $page) use ($urlGenerator) {
-                    $url = $urlGenerator->generate('/campaign/campaign/index');
+                    $url = $urlGenerator->generate('/campaign/default/index');
                     if ($page > 1) {
                         $url = $url . '?page=' . $page;
                     }

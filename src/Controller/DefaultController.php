@@ -16,8 +16,9 @@ use Yiisoft\Yii\View\ViewRenderer;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
 use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Filter\CampaignFilter;
+use Mailery\Campaign\Service\CampaignCrudService;
 
-class CampaignController
+class DefaultController
 {
     private const PAGINATION_INDEX = 10;
 
@@ -117,11 +118,21 @@ class CampaignController
 
     /**
      * @param Request $request
+     * @param CampaignCrudService $campaignCrudService
      * @param UrlGenerator $urlGenerator
      * @return Response
      */
-    public function delete(Request $request, UrlGenerator $urlGenerator): Response
+    public function delete(Request $request, CampaignCrudService $campaignCrudService, UrlGenerator $urlGenerator): Response
     {
-        ;
+        $campaignId = $request->getAttribute('id');
+        if (empty($campaignId) || ($campaign = $this->campaignRepo->findByPK($campaignId)) === null) {
+            return $this->responseFactory->createResponse(404);
+        }
+
+        $campaignCrudService->delete($campaign);
+
+        return $this->responseFactory
+            ->createResponse(302)
+            ->withHeader('Location', $urlGenerator->generate('/campaign/default/index'));
     }
 }

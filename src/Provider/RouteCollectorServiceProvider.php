@@ -7,7 +7,7 @@ use Yiisoft\Di\Support\ServiceProvider;
 use Yiisoft\Router\RouteCollectorInterface;
 use Yiisoft\Router\Group;
 use Yiisoft\Router\Route;
-use Mailery\Campaign\Controller\CampaignController;
+use Mailery\Campaign\Controller\DefaultController;
 
 final class RouteCollectorServiceProvider extends ServiceProvider
 {
@@ -21,16 +21,16 @@ final class RouteCollectorServiceProvider extends ServiceProvider
                 '/brand/{brandId:\d+}',
                 [
                     // Campaigns:
-                    Route::get('/campaigns', [CampaignController::class, 'index'])
-                        ->name('/campaign/campaign/index'),
-                    Route::get('/campaign/campaign/view/{id:\d+}', [CampaignController::class, 'view'])
-                        ->name('/campaign/campaign/view'),
-                    Route::methods(['GET', 'POST'], '/campaign/campaign/create', [CampaignController::class, 'create'])
-                        ->name('/campaign/campaign/create'),
-                    Route::methods(['GET', 'POST'], '/campaign/campaign/edit/{id:\d+}', [CampaignController::class, 'edit'])
-                        ->name('/campaign/campaign/edit'),
-                    Route::delete('/campaign/campaign/delete/{id:\d+}', [CampaignController::class, 'delete'])
-                        ->name('/campaign/campaign/delete'),
+                    Route::get('/campaigns', [DefaultController::class, 'index'])
+                        ->name('/campaign/default/index'),
+                    Route::get('/campaign/default/view/{id:\d+}', [DefaultController::class, 'view'])
+                        ->name('/campaign/default/view'),
+                    Route::methods(['GET', 'POST'], '/campaign/default/create', [DefaultController::class, 'create'])
+                        ->name('/campaign/default/create'),
+                    Route::methods(['GET', 'POST'], '/campaign/default/edit/{id:\d+}', [DefaultController::class, 'edit'])
+                        ->name('/campaign/default/edit'),
+                    Route::delete('/campaign/default/delete/{id:\d+}', [DefaultController::class, 'delete'])
+                        ->name('/campaign/default/delete'),
                 ]
             )
         );

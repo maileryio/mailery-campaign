@@ -35,14 +35,14 @@ return [
                         'campaigns' => (new MenuItem())
                             ->withLabel('All Campaigns')
                             ->withUrl(new SerializableClosure(function (UrlGeneratorInterface $urlGenerator) {
-                                return $urlGenerator->generate('/campaign/campaign/index');
+                                return $urlGenerator->generate('/campaign/default/index');
                             }))
                             ->withActiveRouteNames([
-                                '/campaign/campaign/index',
-                                '/campaign/campaign/view',
-                                '/campaign/campaign/create',
-                                '/campaign/campaign/edit',
-                                '/campaign/campaign/delete',
+                                '/campaign/default/index',
+                                '/campaign/default/view',
+                                '/campaign/default/create',
+                                '/campaign/default/edit',
+                                '/campaign/default/delete',
                             ])
                             ->withOrder(100),
                     ])
