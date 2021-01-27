@@ -15,7 +15,9 @@ namespace Mailery\Campaign\Entity;
 use RuntimeException;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Common\Entity\RoutableEntityInterface;
-
+use Mailery\Template\Entity\Template;
+use Cycle\ORM\Relation\Pivoted\PivotedCollection;
+use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
 /**
  * @Cycle\Annotated\Annotation\Entity(
  *      table = "campaigns",
@@ -23,7 +25,7 @@ use Mailery\Common\Entity\RoutableEntityInterface;
  *      mapper = "Mailery\Campaign\Mapper\DefaultMapper"
  * )
  */
-class Campaign implements RoutableEntityInterface
+abstract class Campaign implements RoutableEntityInterface
 {
     /**
      * @Cycle\Annotated\Annotation\Column(type = "primary")
@@ -42,6 +44,23 @@ class Campaign implements RoutableEntityInterface
      * @var string
      */
     protected $name;
+
+    /**
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false)
+     * @var Brand
+     */
+    protected $template;
+
+    /**
+     * @Cycle\Annotated\Annotation\Relation\ManyToMany(target = "Mailery\Subscriber\Entity\Group", though = "CampaignGroup", nullable = false)
+     * @var PivotedCollectionInterface
+     */
+    protected $groups;
+
+    public function __construct()
+    {
+        $this->groups = new PivotedCollection();
+    }
 
     /**
      * @return string
@@ -109,6 +128,44 @@ class Campaign implements RoutableEntityInterface
     }
 
     /**
+     * @return Template
+     */
+    public function getTemplate(): Template
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param Template $template
+     * @return self
+     */
+    public function setTemplate(Template $template): self
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * @return PivotedCollectionInterface
+     */
+    public function getGroups(): PivotedCollectionInterface
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param PivotedCollectionInterface $groups
+     * @return self
+     */
+    public function setGroups(PivotedCollectionInterface $groups): self
+    {
+        $this->groups = $groups;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEditRouteName(): ?string
@@ -138,5 +195,21 @@ class Campaign implements RoutableEntityInterface
     public function getViewRouteParams(): array
     {
         throw new RuntimeException('Must be implemented in nested.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeleteRouteName(): ?string
+    {
+        return '/campaign/default/delete';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeleteRouteParams(): array
+    {
+        return ['id' => $this->getId()];
     }
 }

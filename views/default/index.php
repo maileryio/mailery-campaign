@@ -4,6 +4,7 @@ use Mailery\Activity\Log\Widget\ActivityLogLink;
 use Mailery\Icon\Icon;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Module;
+use Mailery\Subscriber\Entity\Group;
 use Mailery\Widget\Dataview\Columns\ActionColumn;
 use Mailery\Widget\Dataview\Columns\DataColumn;
 use Mailery\Widget\Dataview\GridView;
@@ -75,7 +76,31 @@ $this->setTitle('All campaigns');
                     ->content(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
                             $data->getName(),
-                            $urlGenerator->generate('/campaign/default/view', ['id' => $data->getId()])
+                            $urlGenerator->generate($data->getViewRouteName(), $data->getViewRouteParams())
+                        );
+                    }),
+                (new DataColumn())
+                    ->header('Template')
+                    ->content(function (Campaign $data, int $index) use ($urlGenerator) {
+                        return Html::a(
+                            $data->getTemplate()->getName(),
+                            $urlGenerator->generate($data->getTemplate()->getViewRouteName(), $data->getTemplate()->getViewRouteParams())
+                        );
+                    }),
+                (new DataColumn())
+                    ->header('Groups')
+                    ->content(function (Campaign $data, int $index) use ($urlGenerator) {
+                        return implode(
+                            '<br />',
+                            array_map(
+                                function (Group $group) use($urlGenerator) {
+                                    return Html::a(
+                                        $group->getName(),
+                                        $urlGenerator->generate($group->getViewRouteName(), $group->getViewRouteParams())
+                                    );
+                                },
+                                $data->getGroups()->toArray()
+                            )
                         );
                     }),
                 (new ActionColumn())
@@ -87,7 +112,7 @@ $this->setTitle('All campaigns');
                     ->update(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
                             (string) Icon::widget()->name('pencil'),
-                            $urlGenerator->generate('/campaign/default/edit', ['id' => $data->getId()]),
+                            $urlGenerator->generate($data->getEditRouteName(), $data->getEditRouteParams()),
                             [
                                 'class' => 'text-decoration-none mr-3',
                             ]
@@ -105,7 +130,7 @@ $this->setTitle('All campaigns');
                         return Link::widget()
                             ->label((string) Icon::widget()->name('delete')->options(['class' => 'mr-1']))
                             ->method('delete')
-                            ->href($urlGenerator->generate('/campaign/default/delete', ['id' => $data->getId()]))
+                            ->href($urlGenerator->generate($data->getDeleteRouteName(), $data->getDeleteRouteParams()))
                             ->confirm('Are you sure?')
                             ->options([
                                 'class' => 'text-decoration-none text-danger',
