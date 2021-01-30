@@ -10,8 +10,6 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2020, Mailery (https://mailery.io/)
  */
 
-use Mailery\Menu\MenuItem;
-use Opis\Closure\SerializableClosure;
 use Yiisoft\Router\UrlGeneratorInterface;
 
 return [
@@ -25,28 +23,32 @@ return [
         ],
     ],
 
-    'menu' => [
-        'sidebar' => [
-            'items' => [
-                'campaigns' => (new MenuItem())
-                    ->withLabel('Campaigns')
-                    ->withIcon('campaign')
-                    ->withChildItems([
-                        'campaigns' => (new MenuItem())
-                            ->withLabel('All Campaigns')
-                            ->withUrl(new SerializableClosure(function (UrlGeneratorInterface $urlGenerator) {
-                                return $urlGenerator->generate('/campaign/default/index');
-                            }))
-                            ->withActiveRouteNames([
-                                '/campaign/default/index',
-                                '/campaign/default/view',
-                                '/campaign/default/create',
-                                '/campaign/default/edit',
-                                '/campaign/default/delete',
-                            ])
-                            ->withOrder(100),
-                    ])
-                    ->withOrder(200),
+    'maileryio/mailery-menu-sidebar' => [
+        'items' => [
+            'campaigns' => [
+                'label' => static function () {
+                    return 'Campaigns';
+                },
+                'icon' => 'campaign',
+                'order' => 200,
+                'items' => [
+                    'campaigns' => [
+                        'label' => static function () {
+                            return 'All Campaigns';
+                        },
+                        'url' => static function (UrlGeneratorInterface $urlGenerator) {
+                            return $urlGenerator->generate('/campaign/default/index');
+                        },
+                        'order' => 100,
+                        'activeRouteNames' => [
+                            '/campaign/default/index',
+                            '/campaign/default/view',
+                            '/campaign/default/create',
+                            '/campaign/default/edit',
+                            '/campaign/default/delete',
+                        ],
+                    ],
+                ],
             ],
         ],
     ],
