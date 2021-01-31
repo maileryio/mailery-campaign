@@ -17,6 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
 use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Filter\CampaignFilter;
 use Mailery\Campaign\Service\CampaignCrudService;
+use Mailery\Brand\Service\BrandLocatorInterface;
 
 class DefaultController
 {
@@ -40,11 +41,13 @@ class DefaultController
     /**
      * @param ViewRenderer $viewRenderer
      * @param ResponseFactory $responseFactory
+     * @param BrandLocatorInterface $brandLocator
      * @param CampaignRepository $campaignRepo
      */
     public function __construct(
         ViewRenderer $viewRenderer,
         ResponseFactory $responseFactory,
+        BrandLocatorInterface $brandLocator,
         CampaignRepository $campaignRepo
     ) {
         $this->viewRenderer = $viewRenderer
@@ -52,7 +55,7 @@ class DefaultController
             ->withViewBasePath(dirname(dirname(__DIR__)) . '/views');
 
         $this->responseFactory = $responseFactory;
-        $this->campaignRepo = $campaignRepo;
+        $this->campaignRepo = $campaignRepo->withBrand($brandLocator->getBrand());
     }
 
     /**
