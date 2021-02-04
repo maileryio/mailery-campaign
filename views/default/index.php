@@ -115,6 +115,7 @@ $this->setTitle('All campaigns');
                             $urlGenerator->generate($data->getEditRouteName(), $data->getEditRouteParams()),
                             [
                                 'class' => 'text-decoration-none mr-3',
+                                'encode' => false,
                             ]
                         );
                     })
@@ -134,6 +135,7 @@ $this->setTitle('All campaigns');
                             ->confirm('Are you sure?')
                             ->options([
                                 'class' => 'text-decoration-none text-danger',
+                                'encode' => false,
                             ]);
                     }),
             ]);
