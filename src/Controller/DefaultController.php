@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
 use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Filter\CampaignFilter;
 use Mailery\Campaign\Service\CampaignCrudService;
-use Mailery\Brand\Service\BrandLocatorInterface;
+use Mailery\Brand\BrandLocatorInterface;
 
 class DefaultController
 {

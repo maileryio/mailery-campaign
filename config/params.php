@@ -30,7 +30,6 @@ return [
                     return 'Campaigns';
                 },
                 'icon' => 'campaign',
-                'order' => 200,
                 'items' => [
                     'campaigns' => [
                         'label' => static function () {
@@ -39,7 +38,6 @@ return [
                         'url' => static function (UrlGeneratorInterface $urlGenerator) {
                             return $urlGenerator->generate('/campaign/default/index');
                         },
-                        'order' => 100,
                         'activeRouteNames' => [
                             '/campaign/default/index',
                             '/campaign/default/view',
