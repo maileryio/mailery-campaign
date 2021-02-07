@@ -18,6 +18,7 @@ use Mailery\Common\Entity\RoutableEntityInterface;
 use Mailery\Template\Entity\Template;
 use Cycle\ORM\Relation\Pivoted\PivotedCollection;
 use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
+
 /**
  * @Cycle\Annotated\Annotation\Entity(
  *      table = "campaigns",
