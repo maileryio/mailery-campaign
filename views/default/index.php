@@ -111,13 +111,13 @@ $this->setTitle('All campaigns');
                     ->view('')
                     ->update(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
-                            (string) Icon::widget()->name('pencil'),
+                            Icon::widget()->name('pencil')->render(),
                             $urlGenerator->generate($data->getEditRouteName(), $data->getEditRouteParams()),
                             [
                                 'class' => 'text-decoration-none mr-3',
-                                'encode' => false,
                             ]
-                        );
+                        )
+                        ->encode(false);
                     })
                     ->delete(''),
                 (new ActionColumn())
@@ -129,14 +129,14 @@ $this->setTitle('All campaigns');
                     ->update('')
                     ->delete(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Link::widget()
-                            ->label((string) Icon::widget()->name('delete')->options(['class' => 'mr-1']))
+                            ->label(Icon::widget()->name('delete')->options(['class' => 'mr-1'])->render())
                             ->method('delete')
                             ->href($urlGenerator->generate($data->getDeleteRouteName(), $data->getDeleteRouteParams()))
                             ->confirm('Are you sure?')
                             ->options([
                                 'class' => 'text-decoration-none text-danger',
-                                'encode' => false,
-                            ]);
+                            ])
+                            ->encode(false);
                     }),
             ]);
         ?>
