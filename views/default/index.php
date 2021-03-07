@@ -44,7 +44,7 @@ $this->setTitle('All campaigns');
                     <?php foreach ($campaignTypes as $campaignType) {
                         echo Html::tag(
                             'b-dropdown-item',
-                            $campaignType->getShortLabel(),
+                            $campaignType->getCreateLabel(),
                             [
                                 'href' => $urlGenerator->generate($campaignType->getCreateRouteName(), $campaignType->getCreateRouteParams()),
                             ]

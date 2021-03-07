@@ -12,7 +12,7 @@ interface CampaignTypeInterface
     /**
      * @return string
      */
-    public function getShortLabel(): string;
+    public function getCreateLabel(): string;
 
     /**
      * @return string|null
