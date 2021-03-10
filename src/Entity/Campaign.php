@@ -41,7 +41,7 @@ abstract class Campaign implements RoutableEntityInterface
     protected $brand;
 
     /**
-     * @Cycle\Annotated\Annotation\Column(type = "string(32)")
+     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
      * @var string
      */
     protected $name;
