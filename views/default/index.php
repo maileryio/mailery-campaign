@@ -88,7 +88,7 @@ $this->setTitle('All campaigns');
                         );
                     }),
                 (new DataColumn())
-                    ->header('Groups')
+                    ->header('Recipients')
                     ->content(function (Campaign $data, int $index) use ($urlGenerator) {
                         return implode(
                             '<br />',
