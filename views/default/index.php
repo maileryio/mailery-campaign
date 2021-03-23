@@ -5,6 +5,7 @@ use Mailery\Icon\Icon;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Module;
 use Mailery\Subscriber\Entity\Group;
+use Mailery\Sender\Entity\Sender;
 use Mailery\Widget\Dataview\Columns\ActionColumn;
 use Mailery\Widget\Dataview\Columns\DataColumn;
 use Mailery\Widget\Dataview\GridView;
@@ -80,6 +81,14 @@ $this->setTitle('All campaigns');
                         );
                     }),
                 (new DataColumn())
+                    ->header('Sender')
+                    ->content(function (Campaign $data, int $index) use ($urlGenerator) {
+                        return Html::a(
+                            $data->getSender()->getName(),
+                            $urlGenerator->generate($data->getSender()->getViewRouteName(), $data->getSender()->getViewRouteParams())
+                        );
+                    }),
+                (new DataColumn())
                     ->header('Template')
                     ->content(function (Campaign $data, int $index) use ($urlGenerator) {
                         return Html::a(
@@ -88,7 +97,7 @@ $this->setTitle('All campaigns');
                         );
                     }),
                 (new DataColumn())
-                    ->header('Recipients')
+                    ->header('Groups')
                     ->content(function (Campaign $data, int $index) use ($urlGenerator) {
                         return implode(
                             '<br />',

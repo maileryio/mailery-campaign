@@ -16,6 +16,7 @@ use RuntimeException;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Common\Entity\RoutableEntityInterface;
 use Mailery\Template\Entity\Template;
+use Mailery\Sender\Entity\Sender;
 use Cycle\ORM\Relation\Pivoted\PivotedCollection;
 use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
 
@@ -45,6 +46,12 @@ abstract class Campaign implements RoutableEntityInterface
      * @var string
      */
     protected $name;
+
+    /**
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", nullable = false)
+     * @var Brand
+     */
+    protected $sender;
 
     /**
      * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false)
@@ -124,6 +131,25 @@ abstract class Campaign implements RoutableEntityInterface
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Sender
+     */
+    public function getSender(): Sender
+    {
+        return $this->sender;
+    }
+
+    /**
+     * @param Sender $sender
+     * @return self
+     */
+    public function setSender(Sender $sender): self
+    {
+        $this->sender = $sender;
 
         return $this;
     }
