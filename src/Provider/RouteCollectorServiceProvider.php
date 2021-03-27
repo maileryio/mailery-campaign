@@ -21,22 +21,25 @@ final class RouteCollectorServiceProvider extends ServiceProvider
         $collector = $container->get(RouteCollectorInterface::class);
 
         $collector->addGroup(
-            Group::create(
-                '/brand/{brandId:\d+}',
-                [
+            Group::create('/brand/{brandId:\d+}')
+                ->routes(
                     // Campaigns:
-                    Route::get('/campaigns', [DefaultController::class, 'index'])
-                        ->name('/campaign/default/index'),
-                    Route::get('/campaign/default/view/{id:\d+}', [DefaultController::class, 'view'])
-                        ->name('/campaign/default/view'),
-                    Route::methods(['GET', 'POST'], '/campaign/default/create', [DefaultController::class, 'create'])
-                        ->name('/campaign/default/create'),
-                    Route::methods(['GET', 'POST'], '/campaign/default/edit/{id:\d+}', [DefaultController::class, 'edit'])
-                        ->name('/campaign/default/edit'),
-                    Route::delete('/campaign/default/delete/{id:\d+}', [DefaultController::class, 'delete'])
-                        ->name('/campaign/default/delete'),
-                ]
-            )
+                    Route::get('/campaigns')
+                        ->name('/campaign/default/index')
+                        ->action([DefaultController::class, 'index']),
+                    Route::get('/campaign/default/view/{id:\d+}')
+                        ->name('/campaign/default/view')
+                        ->action([DefaultController::class, 'view']),
+                    Route::methods(['GET', 'POST'], '/campaign/default/create')
+                        ->name('/campaign/default/create')
+                        ->action([DefaultController::class, 'create']),
+                    Route::methods(['GET', 'POST'], '/campaign/default/edit/{id:\d+}')
+                        ->name('/campaign/default/edit')
+                        ->action([DefaultController::class, 'edit']),
+                    Route::delete('/campaign/default/delete/{id:\d+}')
+                        ->name('/campaign/default/delete')
+                        ->action([DefaultController::class, 'delete'])
+                )
         );
     }
 }
