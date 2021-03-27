@@ -3,7 +3,7 @@
 namespace Mailery\Campaign\Provider;
 
 use Yiisoft\Di\Support\ServiceProvider;
-use Yiisoft\Di\Container;
+use Psr\Container\ContainerInterface;
 use Yiisoft\Factory\Factory;
 use Mailery\Campaign\Provider\CampaignTypeConfigs;
 use Mailery\Campaign\Model\CampaignTypeList;
@@ -11,10 +11,10 @@ use Mailery\Campaign\Model\CampaignTypeList;
 final class CampaignTypeServiceProvider extends ServiceProvider
 {
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
      * @return void
      */
-    public function register(Container $container): void
+    public function register(ContainerInterface $container): void
     {
         $factory = new Factory();
         $configs = $container->get(CampaignTypeConfigs::class)->getConfigs();
