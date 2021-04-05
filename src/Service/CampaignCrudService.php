@@ -3,8 +3,8 @@
 namespace Mailery\Campaign\Service;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Transaction;
 use Mailery\Campaign\Entity\Campaign;
+use Yiisoft\Yii\Cycle\Data\Writer\EntityWriter;
 
 class CampaignCrudService
 {
@@ -27,9 +27,7 @@ class CampaignCrudService
      */
     public function delete(Campaign $campaign): bool
     {
-        $tr = new Transaction($this->orm);
-        $tr->delete($campaign);
-        $tr->run();
+        (new EntityWriter($this->orm))->delete([$campaign]);
 
         return true;
     }
