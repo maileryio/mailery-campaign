@@ -48,14 +48,20 @@ abstract class Campaign implements RoutableEntityInterface
     protected $name;
 
     /**
+     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
+     * @var string
+     */
+    protected $channel;
+
+    /**
      * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", nullable = false)
-     * @var Brand
+     * @var Sender
      */
     protected $sender;
 
     /**
      * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false)
-     * @var Brand
+     * @var Template
      */
     protected $template;
 
@@ -131,6 +137,25 @@ abstract class Campaign implements RoutableEntityInterface
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannel(): string
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @param string $channel
+     * @return self
+     */
+    public function setChannel(string $channel): self
+    {
+        $this->channel = $channel;
 
         return $this;
     }
