@@ -24,14 +24,6 @@ class SendTestForm extends FormModel
     }
 
     /**
-     * @return string
-     */
-    public function formName(): string
-    {
-        return 'SendTestForm';
-    }
-
-    /**
      * @return array
      */
     public function getRules(): array

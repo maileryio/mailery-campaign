@@ -12,9 +12,8 @@ declare(strict_types=1);
 
 namespace Mailery\Campaign\Entity;
 
-use RuntimeException;
 use Mailery\Brand\Entity\Brand;
-use Mailery\Common\Entity\RoutableEntityInterface;
+use Mailery\Channel\Entity\Channel;
 use Mailery\Template\Entity\Template;
 use Mailery\Sender\Entity\Sender;
 use Cycle\ORM\Relation\Pivoted\PivotedCollection;
@@ -27,7 +26,7 @@ use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
  *      mapper = "Mailery\Campaign\Mapper\DefaultMapper"
  * )
  */
-abstract class Campaign implements RoutableEntityInterface
+abstract class Campaign
 {
     /**
      * @Cycle\Annotated\Annotation\Column(type = "primary")
@@ -48,19 +47,19 @@ abstract class Campaign implements RoutableEntityInterface
     protected $name;
 
     /**
-     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
-     * @var string
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Channel\Entity\Channel", nullable = false, load = "eager")
+     * @var Channel
      */
     protected $channel;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", nullable = false)
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", nullable = false, load = "eager")
      * @var Sender
      */
     protected $sender;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false)
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false, load = "eager")
      * @var Template
      */
     protected $template;
@@ -142,18 +141,18 @@ abstract class Campaign implements RoutableEntityInterface
     }
 
     /**
-     * @return string
+     * @return Channel
      */
-    public function getChannel(): string
+    public function getChannel(): Channel
     {
         return $this->channel;
     }
 
     /**
-     * @param string $channel
+     * @param Channel $channel
      * @return self
      */
-    public function setChannel(string $channel): self
+    public function setChannel(Channel $channel): self
     {
         $this->channel = $channel;
 
@@ -215,53 +214,5 @@ abstract class Campaign implements RoutableEntityInterface
         $this->groups = $groups;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEditRouteName(): ?string
-    {
-        throw new RuntimeException('Must be implemented in nested.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEditRouteParams(): array
-    {
-        throw new RuntimeException('Must be implemented in nested.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getViewRouteName(): ?string
-    {
-        throw new RuntimeException('Must be implemented in nested.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getViewRouteParams(): array
-    {
-        throw new RuntimeException('Must be implemented in nested.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeleteRouteName(): ?string
-    {
-        return '/campaign/default/delete';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeleteRouteParams(): array
-    {
-        return ['id' => $this->getId()];
     }
 }

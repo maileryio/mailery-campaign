@@ -23,4 +23,10 @@ interface CampaignTypeInterface
      * @return array
      */
     public function getCreateRouteParams(): array;
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    public function isEntitySameType(object $entity): bool;
 }

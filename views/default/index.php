@@ -20,6 +20,8 @@ use Yiisoft\Html\Html;
 /** @var Yiisoft\Router\UrlGeneratorInterface $urlGenerator */
 /** @var Yiisoft\Data\Reader\DataReaderInterface $dataReader*/
 /** @var Yiisoft\Data\Paginator\PaginatorInterface $paginator */
+/** @var Mailery\Campaign\Model\CampaignTypeList $campaignTypeList */
+
 $this->setTitle('All campaigns');
 
 ?><div class="row">
@@ -42,7 +44,7 @@ $this->setTitle('All campaigns');
                         <?= Icon::widget()->name('plus')->options(['class' => 'mr-1']); ?>
                         Add new campaign
                     </template>
-                    <?php foreach ($campaignTypes as $campaignType) {
+                    <?php foreach ($campaignTypeList as $campaignType) {
                         echo Html::tag(
                             'b-dropdown-item',
                             $campaignType->getCreateLabel(),
@@ -79,6 +81,12 @@ $this->setTitle('All campaigns');
                             $data->getName(),
                             $urlGenerator->generate($data->getViewRouteName(), $data->getViewRouteParams())
                         );
+                    }),
+                (new DataColumn())
+                    ->header('Type')
+                    ->content(function (Campaign $data, int $index) use ($campaignTypeList) {
+                        $campaignType = $campaignTypeList->findByEntity($data);
+                        return $campaignType ? $campaignType->getLabel() : null;
                     }),
                 (new DataColumn())
                     ->header('Sender')
