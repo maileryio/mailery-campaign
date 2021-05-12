@@ -35,7 +35,7 @@ abstract class Campaign
     protected $id;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Brand\Entity\Brand", nullable = false)
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Brand\Entity\Brand")
      * @var Brand
      */
     protected $brand;
@@ -47,25 +47,25 @@ abstract class Campaign
     protected $name;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Channel\Entity\Channel", nullable = false, load = "eager")
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Channel\Entity\Channel", load = "eager")
      * @var Channel
      */
     protected $channel;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", nullable = false, load = "eager")
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", load = "eager")
      * @var Sender
      */
     protected $sender;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", nullable = false, load = "eager")
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", load = "eager")
      * @var Template
      */
     protected $template;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\ManyToMany(target = "Mailery\Subscriber\Entity\Group", though = "CampaignGroup", nullable = false)
+     * @Cycle\Annotated\Annotation\Relation\ManyToMany(target = "Mailery\Subscriber\Entity\Group", though = "CampaignGroup")
      * @var PivotedCollectionInterface
      */
     protected $groups;

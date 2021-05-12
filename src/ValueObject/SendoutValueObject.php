@@ -3,31 +3,19 @@
 namespace Mailery\Campaign\ValueObject;
 
 use Mailery\Campaign\Entity\Campaign;
-use Mailery\Campaign\Form\SendTestForm;
+use Mailery\Campaign\Recipient\Model\RecipientIterator;
 
 class SendoutValueObject
 {
-    /**
-     * @var string
-     */
-    private string $recipients;
-
     /**
      * @var Campaign
      */
     private Campaign $campaign;
 
     /**
-     * @param SendTestForm $form
-     * @return self
+     * @var RecipientIterator
      */
-    public static function fromTestForm(SendTestForm $form): self
-    {
-        $new = new self();
-        $new->recipients = $form->getAttributeValue('recipients');
-
-        return $new;
-    }
+    private RecipientIterator $recipients;
 
     /**
      * @param Campaign $campaign
@@ -42,10 +30,30 @@ class SendoutValueObject
     }
 
     /**
+     * @param RecipientIterator $recipients
+     * @return self
+     */
+    public function withRecipients(RecipientIterator $recipients): self
+    {
+        $new = clone $this;
+        $new->recipients = $recipients;
+
+        return $new;
+    }
+
+    /**
      * @return Campaign
      */
     public function getCampagn(): Campaign
     {
         return $this->campaign;
+    }
+
+    /**
+     * @return RecipientIterator
+     */
+    public function getRecipients(): RecipientIterator
+    {
+        return $this->recipients;
     }
 }

@@ -5,6 +5,8 @@ namespace Mailery\Campaign\Entity;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
+use Cycle\ORM\Relation\Pivoted\PivotedCollection;
+use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
 
 /**
  * @Cycle\Annotated\Annotation\Entity(
@@ -23,10 +25,21 @@ class Sendout implements LoggableEntityInterface
     private $id;
 
     /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Campaign\Entity\Campaign", nullable = false)
+     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Campaign\Entity\Campaign")
      * @var Campaign
      */
-    protected $campaign;
+    private $campaign;
+
+    /**
+     * @Cycle\Annotated\Annotation\Relation\HasMany(target = "Mailery\Campaign\Entity\Recipient")
+     * @var PivotedCollectionInterface
+     */
+    private $recipients;
+
+    public function __construct()
+    {
+        $this->recipients = new PivotedCollection();
+    }
 
     /**
      * @return string
@@ -70,6 +83,25 @@ class Sendout implements LoggableEntityInterface
     public function setCampaign(Campaign $campaign): self
     {
         $this->campaign = $campaign;
+
+        return $this;
+    }
+
+    /**
+     * @return PivotedCollectionInterface
+     */
+    public function getRecipients(): PivotedCollectionInterface
+    {
+        return $this->recipients;
+    }
+
+    /**
+     * @param PivotedCollectionInterface $recipients
+     * @return self
+     */
+    public function setRecipients(PivotedCollectionInterface $recipients): self
+    {
+        $this->recipients = $recipients;
 
         return $this;
     }
