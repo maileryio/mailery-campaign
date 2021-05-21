@@ -8,6 +8,11 @@ use Mailery\Campaign\Recipient\Model\RecipientIterator;
 class SendoutValueObject
 {
     /**
+     * @var bool
+     */
+    private bool $isTest = false;
+
+    /**
      * @var Campaign
      */
     private Campaign $campaign;
@@ -16,6 +21,18 @@ class SendoutValueObject
      * @var RecipientIterator
      */
     private RecipientIterator $recipients;
+
+    /**
+     * @param bool $isTest
+     * @return self
+     */
+    public function withIsTest(bool $isTest): self
+    {
+        $new = clone $this;
+        $new->isTest = $isTest;
+
+        return $new;
+    }
 
     /**
      * @param Campaign $campaign
@@ -39,6 +56,14 @@ class SendoutValueObject
         $new->recipients = $recipients;
 
         return $new;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsTest(): bool
+    {
+        return $this->isTest;
     }
 
     /**

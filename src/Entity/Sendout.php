@@ -25,6 +25,18 @@ class Sendout implements LoggableEntityInterface
     private $id;
 
     /**
+     * @Cycle\Annotated\Annotation\Column(type = "enum(created, pending, finished)")
+     * @var string
+     */
+    private $status;
+
+    /**
+     * @Cycle\Annotated\Annotation\Column(type = "boolean")
+     * @var bool
+     */
+    private $isTest;
+
+    /**
      * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Campaign\Entity\Campaign")
      * @var Campaign
      */
@@ -64,6 +76,44 @@ class Sendout implements LoggableEntityInterface
     public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return self
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsTest(): string
+    {
+        return $this->isTest;
+    }
+
+    /**
+     * @param string $isTest
+     * @return self
+     */
+    public function setIsTest(string $isTest): self
+    {
+        $this->isTest = $isTest;
 
         return $this;
     }
