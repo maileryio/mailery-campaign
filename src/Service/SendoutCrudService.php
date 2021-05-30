@@ -36,13 +36,6 @@ class SendoutCrudService
             ->setCampaign($valueObject->getCampagn())
         ;
 
-        foreach ($valueObject->getRecipients() as $recipient) {
-            if ($sendout->getRecipients()->hasPivot($recipient)) {
-                continue;
-            }
-            $sendout->getRecipients()->add($recipient);
-        }
-
         (new EntityWriter($this->orm))->write([$sendout]);
 
         return $sendout;

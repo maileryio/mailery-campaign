@@ -132,6 +132,14 @@ class Recipient implements LoggableEntityInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasSendout(): bool
+    {
+        return $this->sendout !== null;
+    }
+
+    /**
      * @return Subscriber|null
      */
     public function getSubscriber(): ?Subscriber
