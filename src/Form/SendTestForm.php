@@ -30,7 +30,7 @@ class SendTestForm extends FormModel
     {
         return [
             'recipients' => [
-                new RequiredHtmlOptions(new Required()),
+                new RequiredHtmlOptions(Required::rule()),
             ],
         ];
     }
