@@ -5,7 +5,6 @@ use Mailery\Icon\Icon;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Module;
 use Mailery\Subscriber\Entity\Group;
-use Mailery\Sender\Entity\Sender;
 use Mailery\Widget\Dataview\Columns\ActionColumn;
 use Mailery\Widget\Dataview\Columns\DataColumn;
 use Mailery\Widget\Dataview\GridView;
