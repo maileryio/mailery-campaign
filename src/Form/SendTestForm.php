@@ -14,6 +14,14 @@ class SendTestForm extends FormModel
     private ?string $recipients = null;
 
     /**
+     * @return string|null
+     */
+    public function getRecipients(): ?string
+    {
+        return $this->recipients;
+    }
+
+    /**
      * @return array
      */
     public function getAttributeLabels(): array
