@@ -5,8 +5,8 @@ namespace Mailery\Campaign\Entity;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
-use Cycle\ORM\Relation\Pivoted\PivotedCollection;
-use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
+use Cycle\ORM\Collection\Pivoted\PivotedCollection;
+use Cycle\ORM\Collection\Pivoted\PivotedCollectionInterface;
 
 /**
  * @Cycle\Annotated\Annotation\Entity(

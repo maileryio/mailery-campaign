@@ -16,8 +16,8 @@ use Mailery\Brand\Entity\Brand;
 use Mailery\Channel\Entity\Channel;
 use Mailery\Template\Entity\Template;
 use Mailery\Sender\Entity\Sender;
-use Cycle\ORM\Relation\Pivoted\PivotedCollection;
-use Cycle\ORM\Relation\Pivoted\PivotedCollectionInterface;
+use Cycle\ORM\Collection\Pivoted\PivotedCollection;
+use Cycle\ORM\Collection\Pivoted\PivotedCollectionInterface;
 
 /**
  * @Cycle\Annotated\Annotation\Entity(

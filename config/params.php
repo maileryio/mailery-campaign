@@ -18,7 +18,7 @@ return [
     ],
 
     'yiisoft/yii-cycle' => [
-        'annotated-entity-paths' => [
+        'entity-paths' => [
             '@vendor/maileryio/mailery-campaign/src/Entity',
         ],
     ],
