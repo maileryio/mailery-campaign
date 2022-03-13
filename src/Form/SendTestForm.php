@@ -3,7 +3,6 @@
 namespace Mailery\Campaign\Form;
 
 use Yiisoft\Form\FormModel;
-use Yiisoft\Form\HtmlOptions\RequiredHtmlOptions;
 use Yiisoft\Validator\Rule\Required;
 
 class SendTestForm extends FormModel
@@ -38,7 +37,7 @@ class SendTestForm extends FormModel
     {
         return [
             'recipients' => [
-                new RequiredHtmlOptions(Required::rule()),
+                Required::rule(),
             ],
         ];
     }

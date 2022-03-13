@@ -11,10 +11,25 @@ declare(strict_types=1);
  */
 
 use Yiisoft\Router\UrlGeneratorInterface;
+use Yiisoft\Definitions\DynamicReference;
+use Mailery\Campaign\Entity\Campaign;
+use Mailery\Campaign\Entity\CampaignGroup;
 
 return [
     'maileryio/mailery-campaign' => [
         'types' => [],
+    ],
+
+    'maileryio/mailery-activity-log' => [
+        'entity-groups' => [
+            'campaign' => [
+                'label' => DynamicReference::to(static fn () => 'Campaign'),
+                'entities' => [
+                    Campaign::class,
+                    CampaignGroup::class,
+                ],
+            ],
+        ],
     ],
 
     'yiisoft/yii-cycle' => [

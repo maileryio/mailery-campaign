@@ -6,22 +6,35 @@ namespace Mailery\Campaign\Entity;
 
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Cycle\ORM\Entity\Behavior;
+use Cycle\Annotated\Annotation\Entity;
+use Cycle\Annotated\Annotation\Column;
 
-/**
- * @Cycle\Annotated\Annotation\Entity(
- *      table = "campaigns_groups",
- *      mapper = "Mailery\Campaign\Mapper\CampaignGroupMapper"
- * )
- */
+#[Entity(
+    table: 'campaigns_groups',
+    mapper: LoggableMapper::class
+)]
+#[Behavior\CreatedAt(
+    field: 'createdAt',
+    column: 'created_at',
+)]
+#[Behavior\UpdatedAt(
+    field: 'updatedAt',
+    column: 'updated_at',
+)]
 class CampaignGroup implements LoggableEntityInterface
 {
     use LoggableEntityTrait;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "primary")
-     * @var int|null
-     */
-    private $id;
+    #[Column(type: 'primary')]
+    private int $id;
+
+    #[Column(type: 'datetime')]
+    private \DateTimeImmutable $createdAt;
+
+    #[Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     /**
      * @return string

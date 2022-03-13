@@ -11,7 +11,6 @@ use Mailery\Campaign\Search\CampaignSearchBy;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Yiisoft\Yii\View\ViewRenderer;
-use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
 use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Filter\CampaignFilter;
 use Mailery\Brand\BrandLocatorInterface;
@@ -21,37 +20,19 @@ class DefaultController
     private const PAGINATION_INDEX = 10;
 
     /**
-     * @var ViewRenderer
-     */
-    private ViewRenderer $viewRenderer;
-
-    /**
-     * @var ResponseFactory
-     */
-    private ResponseFactory $responseFactory;
-
-    /**
-     * @var CampaignRepository
-     */
-    private CampaignRepository $campaignRepo;
-
-    /**
      * @param ViewRenderer $viewRenderer
-     * @param ResponseFactory $responseFactory
-     * @param BrandLocatorInterface $brandLocator
      * @param CampaignRepository $campaignRepo
+     * @param BrandLocatorInterface $brandLocator
      */
     public function __construct(
-        ViewRenderer $viewRenderer,
-        ResponseFactory $responseFactory,
-        BrandLocatorInterface $brandLocator,
-        CampaignRepository $campaignRepo
+        private ViewRenderer $viewRenderer,
+        private CampaignRepository $campaignRepo,
+        BrandLocatorInterface $brandLocator
     ) {
         $this->viewRenderer = $viewRenderer
             ->withController($this)
             ->withViewPath(dirname(dirname(__DIR__)) . '/views');
 
-        $this->responseFactory = $responseFactory;
         $this->campaignRepo = $campaignRepo->withBrand($brandLocator->getBrand());
     }
 

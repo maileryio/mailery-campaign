@@ -12,63 +12,68 @@ declare(strict_types=1);
 
 namespace Mailery\Campaign\Entity;
 
+use Cycle\Annotated\Annotation\Entity;
+use Cycle\Annotated\Annotation\Column;
+use Cycle\Annotated\Annotation\Relation\ManyToMany;
+use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Channel\Entity\Channel;
 use Mailery\Template\Entity\Template;
 use Mailery\Sender\Entity\Sender;
 use Cycle\ORM\Collection\Pivoted\PivotedCollection;
-use Cycle\ORM\Collection\Pivoted\PivotedCollectionInterface;
+use Mailery\Campaign\Repository\CampaignRepository;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Cycle\ORM\Collection\DoctrineCollectionFactory;
+use Cycle\ORM\Entity\Behavior;
+use Mailery\Subscriber\Entity\Group;
+use Mailery\Campaign\Entity\CampaignGroup;
+use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 
-/**
- * @Cycle\Annotated\Annotation\Entity(
- *      table = "campaigns",
- *      repository = "Mailery\Campaign\Repository\CampaignRepository",
- *      mapper = "Mailery\Campaign\Mapper\DefaultMapper"
- * )
- */
+#[Entity(
+    table: 'campaigns',
+    repository: CampaignRepository::class,
+    mapper: LoggableMapper::class
+)]
+#[Behavior\CreatedAt(
+    field: 'createdAt',
+    column: 'created_at',
+)]
+#[Behavior\UpdatedAt(
+    field: 'updatedAt',
+    column: 'updated_at',
+)]
+#[DiscriminatorColumn(name: 'type')]
 abstract class Campaign
 {
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "primary")
-     * @var int|null
-     */
-    protected $id;
+    #[Column(type: 'primary')]
+    protected int $id;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Brand\Entity\Brand")
-     * @var Brand
-     */
-    protected $brand;
+    #[BelongsTo(target: Brand::class)]
+    protected Brand $brand;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
-     * @var string
-     */
-    protected $name;
+    #[Column(type: 'string(255)')]
+    protected string $name;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Channel\Entity\Channel", load = "eager")
-     * @var Channel
-     */
-    protected $channel;
+    #[BelongsTo(target: Channel::class, load: 'eager')]
+    protected Channel $channel;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Sender\Entity\Sender", load = "eager")
-     * @var Sender
-     */
-    protected $sender;
+    #[BelongsTo(target: Sender::class, load: 'eager')]
+    protected Sender $sender;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Template\Entity\Template", load = "eager")
-     * @var Template
-     */
-    protected $template;
+    #[BelongsTo(target: Template::class, load: 'eager')]
+    protected Template $template;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\ManyToMany(target = "Mailery\Subscriber\Entity\Group", though = "CampaignGroup")
-     * @var PivotedCollectionInterface
-     */
-    protected $groups;
+    #[ManyToMany(target: Group::class, though: CampaignGroup::class, collection: DoctrineCollectionFactory::class)]
+    protected PivotedCollection $groups;
+
+    #[Column(type: 'string(255)')]
+    protected string $type;
+
+    #[Column(type: 'datetime')]
+    private \DateTimeImmutable $createdAt;
+
+    #[Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -198,18 +203,18 @@ abstract class Campaign
     }
 
     /**
-     * @return PivotedCollectionInterface
+     * @return PivotedCollection
      */
-    public function getGroups(): PivotedCollectionInterface
+    public function getGroups(): PivotedCollection
     {
         return $this->groups;
     }
 
     /**
-     * @param PivotedCollectionInterface $groups
+     * @param PivotedCollection $groups
      * @return self
      */
-    public function setGroups(PivotedCollectionInterface $groups): self
+    public function setGroups(PivotedCollection $groups): self
     {
         $this->groups = $groups;
 
