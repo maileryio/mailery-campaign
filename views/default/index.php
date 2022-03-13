@@ -3,7 +3,6 @@
 use Mailery\Activity\Log\Widget\ActivityLogLink;
 use Mailery\Icon\Icon;
 use Mailery\Campaign\Entity\Campaign;
-use Mailery\Campaign\Module;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Widget\Dataview\Columns\ActionColumn;
 use Mailery\Widget\Dataview\Columns\DataColumn;
@@ -36,7 +35,7 @@ $this->setTitle('All campaigns');
                     <?= ActivityLogLink::widget()
                         ->tag('b-dropdown-item')
                         ->label('Activity log')
-                        ->module(Module::NAME); ?>
+                        ->group('campaign'); ?>
                 </b-dropdown>
                 <b-dropdown right size="sm" variant="primary" class="mx-sm-1 mb-2">
                     <template v-slot:button-content>
