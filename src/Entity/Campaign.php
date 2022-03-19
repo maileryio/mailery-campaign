@@ -63,7 +63,7 @@ abstract class Campaign
     #[BelongsTo(target: Template::class, load: 'eager')]
     protected Template $template;
 
-    #[ManyToMany(target: Group::class, though: CampaignGroup::class, collection: DoctrineCollectionFactory::class)]
+    #[ManyToMany(target: Group::class, though: CampaignGroup::class, thoughInnerKey: 'campaign_id', thoughOuterKey: 'subscriber_group_id', collection: DoctrineCollectionFactory::class)]
     protected PivotedCollection $groups;
 
     #[Column(type: 'string(255)')]
