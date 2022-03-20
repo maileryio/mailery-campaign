@@ -28,6 +28,7 @@ use Cycle\ORM\Entity\Behavior;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
+use Mailery\Cycle\Mapper\Data\Reader\Inheritance;
 
 #[Entity(
     table: 'campaigns',
@@ -48,11 +49,11 @@ abstract class Campaign
     #[Column(type: 'primary')]
     protected int $id;
 
-    #[BelongsTo(target: Brand::class)]
-    protected Brand $brand;
-
     #[Column(type: 'string(255)')]
     protected string $name;
+
+    #[BelongsTo(target: Brand::class)]
+    protected Brand $brand;
 
     #[BelongsTo(target: Channel::class, load: 'eager')]
     protected Channel $channel;
@@ -70,10 +71,15 @@ abstract class Campaign
     protected string $type;
 
     #[Column(type: 'datetime')]
-    private \DateTimeImmutable $createdAt;
+    protected \DateTimeImmutable $createdAt;
 
     #[Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    protected ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Inheritance|null
+     */
+    private ?Inheritance $inheritance = null;
 
     public function __construct()
     {
@@ -86,6 +92,17 @@ abstract class Campaign
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    /**
+     * @param Inheritance $inheritance
+     * @return self
+     */
+    public function withInheritance(Inheritance $inheritance): self
+    {
+        $this->inheritance = $inheritance;
+
+        return $this;
     }
 
     /**
@@ -103,25 +120,6 @@ abstract class Campaign
     public function setId(int $id): self
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return Brand
-     */
-    public function getBrand(): Brand
-    {
-        return $this->brand;
-    }
-
-    /**
-     * @param Brand $brand
-     * @return self
-     */
-    public function setBrand(Brand $brand): self
-    {
-        $this->brand = $brand;
 
         return $this;
     }
@@ -146,11 +144,30 @@ abstract class Campaign
     }
 
     /**
+     * @return Brand
+     */
+    public function getBrand(): Brand
+    {
+        return $this->brand;
+    }
+
+    /**
+     * @param Brand $brand
+     * @return self
+     */
+    public function setBrand(Brand $brand): self
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    /**
      * @return Channel
      */
     public function getChannel(): Channel
     {
-        return $this->channel;
+        return $this->inheritance ? $this->inheritance->inherit($this->channel) : $this->channel;
     }
 
     /**
@@ -169,7 +186,7 @@ abstract class Campaign
      */
     public function getSender(): Sender
     {
-        return $this->sender;
+        return $this->inheritance ? $this->inheritance->inherit($this->sender) : $this->sender;
     }
 
     /**
@@ -188,7 +205,7 @@ abstract class Campaign
      */
     public function getTemplate(): Template
     {
-        return $this->template;
+        return $this->inheritance ? $this->inheritance->inherit($this->template) : $this->template;
     }
 
     /**

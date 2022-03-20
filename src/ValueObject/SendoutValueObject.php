@@ -3,22 +3,28 @@
 namespace Mailery\Campaign\ValueObject;
 
 use Mailery\Campaign\Entity\Campaign;
+use Mailery\Campaign\Field\SendoutMode;
 
 class SendoutValueObject
 {
+    /**
+     * @var SendoutMode
+     */
+    private SendoutMode $mode;
+
     /**
      * @var Campaign
      */
     private Campaign $campaign;
 
     /**
-     * @param bool $isTest
+     * @param SendoutMode $mode
      * @return self
      */
-    public function withIsTest(bool $isTest): self
+    public function withMode(SendoutMode $mode): self
     {
         $new = clone $this;
-        $new->isTest = $isTest;
+        $new->mode = $mode;
 
         return $new;
     }
@@ -36,11 +42,11 @@ class SendoutValueObject
     }
 
     /**
-     * @return bool
+     * @return SendoutMode
      */
-    public function getIsTest(): bool
+    public function getMode(): SendoutMode
     {
-        return $this->isTest;
+        return $this->mode;
     }
 
     /**

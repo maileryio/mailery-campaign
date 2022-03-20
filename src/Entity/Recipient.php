@@ -6,46 +6,49 @@ use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
 use Mailery\Subscriber\Entity\Subscriber;
 use Mailery\Campaign\Entity\Sendout;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Cycle\Annotated\Annotation\Entity;
+use Cycle\Annotated\Annotation\Column;
+use Cycle\Annotated\Annotation\Relation\BelongsTo;
+use Cycle\Annotated\Annotation\Relation\RefersTo;
+use Cycle\ORM\Entity\Behavior;
 
-/**
- * @Cycle\Annotated\Annotation\Entity(
- *      table = "sendout_recipients",
- *      mapper = "Mailery\Campaign\Mapper\RecipientMapper"
- * )
- */
+#[Entity(
+    table: 'sendout_recipients',
+    mapper: LoggableMapper::class
+)]
+#[Behavior\CreatedAt(
+    field: 'createdAt',
+    column: 'created_at',
+)]
+#[Behavior\UpdatedAt(
+    field: 'updatedAt',
+    column: 'updated_at',
+)]
 class Recipient implements LoggableEntityInterface
 {
     use LoggableEntityTrait;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "primary")
-     * @var int|null
-     */
-    private $id;
+    #[Column(type: 'primary')]
+    private int $id;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
-     * @var string
-     */
-    private $name;
+    #[Column(type: 'string(255)')]
+    private string $name;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "string(255)")
-     * @var string
-     */
-    private $identifier;
+    #[Column(type: 'string(255)')]
+    private string $identifier;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Campaign\Entity\Sendout")
-     * @var Sendout
-     */
-    private $sendout;
+    #[BelongsTo(target: Sendout::class)]
+    private Sendout $sendout;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\RefersTo(target = "Mailery\Subscriber\Entity\Subscriber", nullable = true)
-     * @var Subscriber|null
-     */
-    private $subscriber;
+    #[RefersTo(target: Subscriber::class, nullable: true)]
+    private ?Subscriber $subscriber = null;
+
+    #[Column(type: 'datetime')]
+    private \DateTimeImmutable $createdAt;
+
+    #[Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     /**
      * @return string
@@ -129,14 +132,6 @@ class Recipient implements LoggableEntityInterface
         $this->sendout = $sendout;
 
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasSendout(): bool
-    {
-        return $this->sendout !== null;
     }
 
     /**

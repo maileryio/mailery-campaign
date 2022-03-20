@@ -4,30 +4,38 @@ namespace Mailery\Campaign\Recipient\Model;
 
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Subscriber\Entity\Subscriber;
-use Mailery\Sender\Email\Model\SenderLabel;
-use Mailery\Campaign\Entity\Recipient;
+use Mailery\Channel\Factory\RecipientFactoryInterface;
+use Mailery\Campaign\Recipient\Model\CallableIterator;
 
 class RecipientIterator extends \AppendIterator
 {
+
+    /**
+     * @param RecipientFactoryInterface $recipientFactory
+     * @return self
+     */
+    public function __construct(
+        private RecipientFactoryInterface $recipientFactory
+    ) {
+        parent::__construct();
+    }
+
     /**
      * @param Group $groups
      * @return self
      */
     public function appendGroups(Group ...$groups): self
     {
-//       foreach ($groups as $group) {
-//           $this->append(new \CallbackFilterIterator(
-//               $group->getSubscribers(),
-//               function (Subscriber $subscriber) {
-//                   return (new Recipient())
-//                        ->setSubscriber($subscriber)
-//                        ->setName($subscriber->getName())
-//                        ->setIdentifier($subscriber->getEmail());
-//               }
-//           ));
-//       }
+        foreach ($groups as $group) {
+            $this->append(new CallableIterator(
+                $group->getSubscribers(),
+                function (Subscriber $subscriber) {
+                    return $this->recipientFactory->fromSubscriber($subscriber);
+                }
+            ));
+        }
 
-       return $this;
+        return $this;
     }
 
     /**
@@ -36,17 +44,14 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendSubscribers(Subscriber ...$subscribers): self
     {
-       $recipients = [];
-       foreach ($subscribers as $subscriber) {
-           $recipients[] = (new Recipient())
-                ->setSubscriber($subscriber)
-                ->setName($subscriber->getName())
-                ->setIdentifier($subscriber->getEmail());
-       }
+        $iterator = new \ArrayIterator();
+        foreach ($subscribers as $subscriber) {
+            $iterator->append($this->recipientFactory->fromSubscriber($subscriber));
+        }
 
-       $this->append(new \ArrayIterator($recipients));
+        $this->append($iterator);
 
-       return $this;
+        return $this;
     }
 
     /**
@@ -55,18 +60,16 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendIdentificators(string ...$identificators): self
     {
-       $recipients = [];
-       foreach ($identificators as $identificator) {
-           foreach (SenderLabel::fromString($identificator) as $senderLabel) {
-               /** @var SenderLabel $senderLabel */
-               $recipients[] = (new Recipient())
-                    ->setName($senderLabel->getName())
-                    ->setIdentifier($senderLabel->getEmail());
-           }
-       }
+        $iterator = new \ArrayIterator();
+        foreach ($identificators as $identificator) {
+            foreach ($this->recipientFactory->fromIdentificator($identificator) as $recipient) {
+                $iterator->append($recipient);
+            }
+        }
 
-       $this->append(new \ArrayIterator($recipients));
+        $this->append($iterator);
 
-       return $this;
+        return $this;
     }
+
 }

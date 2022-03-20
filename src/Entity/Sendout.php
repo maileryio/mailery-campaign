@@ -3,50 +3,54 @@
 namespace Mailery\Campaign\Entity;
 
 use Mailery\Campaign\Entity\Campaign;
+use Mailery\Campaign\Field\SendoutStatus;
+use Mailery\Campaign\Field\SendoutMode;
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
 use Cycle\ORM\Collection\Pivoted\PivotedCollection;
-use Cycle\ORM\Collection\Pivoted\PivotedCollectionInterface;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Cycle\Annotated\Annotation\Entity;
+use Cycle\Annotated\Annotation\Column;
+use Cycle\Annotated\Annotation\Relation\HasMany;
+use Cycle\Annotated\Annotation\Relation\BelongsTo;
+use Cycle\ORM\Entity\Behavior;
 
-/**
- * @Cycle\Annotated\Annotation\Entity(
- *      table = "sendouts",
- *      mapper = "Mailery\Campaign\Mapper\SendoutMapper"
- * )
- */
+#[Entity(
+    table: 'sendouts',
+    mapper: LoggableMapper::class
+)]
+#[Behavior\CreatedAt(
+    field: 'createdAt',
+    column: 'created_at',
+)]
+#[Behavior\UpdatedAt(
+    field: 'updatedAt',
+    column: 'updated_at',
+)]
 class Sendout implements LoggableEntityInterface
 {
     use LoggableEntityTrait;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "primary")
-     * @var int|null
-     */
-    private $id;
+    #[Column(type: 'primary')]
+    private int $id;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "enum(created, pending, finished)")
-     * @var string
-     */
-    private $status;
+    #[Column(type: 'enum(normal, test)', typecast: SendoutMode::class)]
+    private SendoutMode $mode;
 
-    /**
-     * @Cycle\Annotated\Annotation\Column(type = "boolean")
-     * @var bool
-     */
-    private $isTest;
+    #[Column(type: 'enum(created, pending, finished)', typecast: SendoutStatus::class)]
+    private SendoutStatus $status;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\BelongsTo(target = "Mailery\Campaign\Entity\Campaign")
-     * @var Campaign
-     */
-    private $campaign;
+    #[BelongsTo(target: Campaign::class)]
+    private Campaign $campaign;
 
-    /**
-     * @Cycle\Annotated\Annotation\Relation\HasMany(target = "Mailery\Campaign\Entity\Recipient")
-     * @var PivotedCollectionInterface
-     */
-    private $recipients;
+    #[HasMany(target: Recipient::class)]
+    private PivotedCollection $recipients;
+
+    #[Column(type: 'datetime')]
+    private \DateTimeImmutable $createdAt;
+
+    #[Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -81,39 +85,39 @@ class Sendout implements LoggableEntityInterface
     }
 
     /**
-     * @return string
+     * @return SendoutMode
      */
-    public function getStatus(): string
+    public function getMode(): SendoutMode
     {
-        return $this->status;
+        return $this->mode;
     }
 
     /**
-     * @param string $status
+     * @param SendoutMode $mode
      * @return self
      */
-    public function setStatus(string $status): self
+    public function setMode(SendoutMode $mode): self
     {
-        $this->status = $status;
+        $this->mode = $mode;
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return SendoutStatus
      */
-    public function getIsTest(): string
+    public function getStatus(): SendoutStatus
     {
-        return $this->isTest;
+        return $this->status;
     }
 
     /**
-     * @param string $isTest
+     * @param SendoutStatus $status
      * @return self
      */
-    public function setIsTest(string $isTest): self
+    public function setStatus(SendoutStatus $status): self
     {
-        $this->isTest = $isTest;
+        $this->status = $status;
 
         return $this;
     }
@@ -138,18 +142,18 @@ class Sendout implements LoggableEntityInterface
     }
 
     /**
-     * @return PivotedCollectionInterface
+     * @return PivotedCollection
      */
-    public function getRecipients(): PivotedCollectionInterface
+    public function getRecipients(): PivotedCollection
     {
         return $this->recipients;
     }
 
     /**
-     * @param PivotedCollectionInterface $recipients
+     * @param PivotedCollection $recipients
      * @return self
      */
-    public function setRecipients(PivotedCollectionInterface $recipients): self
+    public function setRecipients(PivotedCollection $recipients): self
     {
         $this->recipients = $recipients;
 
