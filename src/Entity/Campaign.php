@@ -28,8 +28,10 @@ use Cycle\ORM\Entity\Behavior;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
-use Mailery\Cycle\Mapper\Data\Reader\Inheritance;
 
+/**
+* This doc block required for STI/JTI
+*/
 #[Entity(
     table: 'campaigns',
     repository: CampaignRepository::class,
@@ -76,11 +78,6 @@ abstract class Campaign
     #[Column(type: 'datetime', nullable: true)]
     protected ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Inheritance|null
-     */
-    private ?Inheritance $inheritance = null;
-
     public function __construct()
     {
         $this->groups = new PivotedCollection();
@@ -92,17 +89,6 @@ abstract class Campaign
     public function __toString(): string
     {
         return $this->getName();
-    }
-
-    /**
-     * @param Inheritance $inheritance
-     * @return self
-     */
-    public function withInheritance(Inheritance $inheritance): self
-    {
-        $this->inheritance = $inheritance;
-
-        return $this;
     }
 
     /**
@@ -167,7 +153,7 @@ abstract class Campaign
      */
     public function getChannel(): Channel
     {
-        return $this->inheritance ? $this->inheritance->inherit($this->channel) : $this->channel;
+        return $this->channel;
     }
 
     /**
@@ -186,7 +172,7 @@ abstract class Campaign
      */
     public function getSender(): Sender
     {
-        return $this->inheritance ? $this->inheritance->inherit($this->sender) : $this->sender;
+        return $this->sender;
     }
 
     /**
@@ -205,7 +191,7 @@ abstract class Campaign
      */
     public function getTemplate(): Template
     {
-        return $this->inheritance ? $this->inheritance->inherit($this->template) : $this->template;
+        return $this->template;
     }
 
     /**
