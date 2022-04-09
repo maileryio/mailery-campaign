@@ -13,7 +13,7 @@ use Cycle\Annotated\Annotation\Column;
 
 #[Entity(
     table: 'campaigns_subscriber_groups',
-    mapper: LoggableMapper::class
+    mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(
     field: 'createdAt',

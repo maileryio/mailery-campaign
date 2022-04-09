@@ -17,7 +17,7 @@ use Cycle\ORM\Entity\Behavior;
 
 #[Entity(
     table: 'sendouts',
-    mapper: LoggableMapper::class
+    mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(
     field: 'createdAt',

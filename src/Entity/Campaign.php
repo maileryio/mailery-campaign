@@ -35,7 +35,7 @@ use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 #[Entity(
     table: 'campaigns',
     repository: CampaignRepository::class,
-    mapper: LoggableMapper::class
+    mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(
     field: 'createdAt',

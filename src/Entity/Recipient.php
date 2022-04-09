@@ -15,7 +15,7 @@ use Cycle\ORM\Entity\Behavior;
 
 #[Entity(
     table: 'sendout_recipients',
-    mapper: LoggableMapper::class
+    mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(
     field: 'createdAt',
