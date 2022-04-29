@@ -100,14 +100,11 @@ abstract class Campaign
     }
 
     /**
-     * @param int $id
-     * @return self
+     * @return string
      */
-    public function setId(int $id): self
+    public function getType(): string
     {
-        $this->id = $id;
-
-        return $this;
+        return $this->type;
     }
 
     /**

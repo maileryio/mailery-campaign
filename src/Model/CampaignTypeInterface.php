@@ -2,8 +2,15 @@
 
 namespace Mailery\Campaign\Model;
 
+use Mailery\Campaign\Entity\Campaign;
+
 interface CampaignTypeInterface
 {
+    /**
+     * @return string
+     */
+    public function getName(): string;
+
     /**
      * @return string
      */
@@ -25,8 +32,8 @@ interface CampaignTypeInterface
     public function getCreateRouteParams(): array;
 
     /**
-     * @param object $entity
+     * @param Campaign $entity
      * @return bool
      */
-    public function isEntitySameType(object $entity): bool;
+    public function isEntitySameType(Campaign $entity): bool;
 }
