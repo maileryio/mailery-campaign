@@ -17,7 +17,6 @@ use Cycle\Annotated\Annotation\Column;
 use Cycle\Annotated\Annotation\Relation\ManyToMany;
 use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Mailery\Brand\Entity\Brand;
-use Mailery\Channel\Entity\Channel;
 use Mailery\Template\Entity\Template;
 use Mailery\Sender\Entity\Sender;
 use Cycle\ORM\Collection\Pivoted\PivotedCollection;
@@ -56,9 +55,6 @@ abstract class Campaign
 
     #[BelongsTo(target: Brand::class)]
     protected Brand $brand;
-
-    #[BelongsTo(target: Channel::class, load: 'eager')]
-    protected Channel $channel;
 
     #[BelongsTo(target: Sender::class, load: 'eager')]
     protected Sender $sender;
@@ -146,25 +142,6 @@ abstract class Campaign
     }
 
     /**
-     * @return Channel
-     */
-    public function getChannel(): Channel
-    {
-        return $this->channel;
-    }
-
-    /**
-     * @param Channel $channel
-     * @return self
-     */
-    public function setChannel(Channel $channel): self
-    {
-        $this->channel = $channel;
-
-        return $this;
-    }
-
-    /**
      * @return Sender
      */
     public function getSender(): Sender
@@ -219,5 +196,13 @@ abstract class Campaign
         $this->groups = $groups;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }
