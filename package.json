@@ -1,11 +1,6 @@
 {
-    "name": "mailery-campaign",
-    "version": "1.0.0",
-    "description": "Campaign module for Mailery Platform",
-    "author": "maileryio",
     "license": "BSD-3-Clause",
-    "bugs": {
-        "url": "https://github.com/maileryio/mailery-campaign/issues"
-    },
-    "homepage": "https://github.com/maileryio/mailery-campaign#readme"
+    "dependencies": {
+        "@maileryio/mailery-campaign-assets": "git+ssh://git@github.com/maileryio/mailery-campaign-assets.git#master"
+    }
 }
