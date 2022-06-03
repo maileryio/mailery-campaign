@@ -86,6 +86,10 @@ $this->setTitle('All campaigns');
                             'value()' => [fn (Campaign $model) => Html::a($model->getName(), $url->generate($model->getViewRouteName(), $model->getViewRouteParams()))],
                         ],
                         [
+                            'label()' => ['Status'],
+                            'value()' => [fn (Campaign $model) => '<span class="badge ' . $model->getStatus()->getCssClass() . '">' . $model->getStatus()->getLabel() . '</span>'],
+                        ],
+                        [
                             'label()' => ['Type'],
                             'value()' => [static function (Campaign $data) use ($campaignTypeList) {
                                 $campaignType = $campaignTypeList->findByEntity($data);

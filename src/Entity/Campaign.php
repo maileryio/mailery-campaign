@@ -26,6 +26,7 @@ use Cycle\ORM\Collection\DoctrineCollectionFactory;
 use Cycle\ORM\Entity\Behavior;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Campaign\Entity\CampaignGroup;
+use Mailery\Campaign\Field\CampaignStatus;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 
 /**
@@ -64,6 +65,9 @@ abstract class Campaign
 
     #[ManyToMany(target: Group::class, though: CampaignGroup::class, thoughInnerKey: 'campaign_id', thoughOuterKey: 'subscriber_group_id', collection: DoctrineCollectionFactory::class)]
     protected PivotedCollection $groups;
+
+    #[Column(type: 'enum(draft, scheduled, queued, sending, sent)', default: 'draft', typecast: CampaignStatus::class)]
+    protected CampaignStatus $status;
 
     #[Column(type: 'string(255)')]
     protected string $type;
@@ -199,10 +203,37 @@ abstract class Campaign
     }
 
     /**
+     * @return CampaignStatus
+     */
+    public function getStatus(): CampaignStatus
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param CampaignStatus $status
+     * @return self
+     */
+    public function setStatus(CampaignStatus $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
      * @return \DateTimeImmutable
      */
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeEdited(): bool
+    {
+        return $this->getStatus()->isDraft();
     }
 }
