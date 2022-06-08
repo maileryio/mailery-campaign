@@ -72,6 +72,15 @@ abstract class Campaign
     #[Column(type: 'string(255)')]
     protected string $type;
 
+    #[Column(type: 'boolean', default: false)]
+    protected bool $trackClicks = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $trackOpens;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $enableUtmTags = false;
+
     #[Column(type: 'datetime')]
     protected \DateTimeImmutable $createdAt;
 
@@ -217,6 +226,63 @@ abstract class Campaign
     public function setStatus(CampaignStatus $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrackClicks(): bool
+    {
+        return $this->trackClicks;
+    }
+
+    /**
+     * @param bool $trackClicks
+     * @return self
+     */
+    public function setTrackClicks(bool $trackClicks): self
+    {
+        $this->trackClicks = $trackClicks;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrackOpens(): bool
+    {
+        return $this->trackOpens;
+    }
+
+    /**
+     * @param bool $trackOpens
+     * @return self
+     */
+    public function setTrackOpens(bool $trackOpens): self
+    {
+        $this->trackOpens = $trackOpens;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnableUtmTags(): bool
+    {
+        return $this->enableUtmTags;
+    }
+
+    /**
+     * @param bool $enableUtmTags
+     * @return self
+     */
+    public function setEnableUtmTags(bool $enableUtmTags): self
+    {
+        $this->enableUtmTags = $enableUtmTags;
 
         return $this;
     }
