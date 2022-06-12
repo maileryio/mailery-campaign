@@ -27,6 +27,7 @@ use Cycle\ORM\Entity\Behavior;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Field\CampaignStatus;
+use Mailery\Campaign\Field\UtmTags;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 
 /**
@@ -80,6 +81,9 @@ abstract class Campaign
 
     #[Column(type: 'boolean', default: false)]
     protected bool $enableUtmTags = false;
+
+    #[Column(type: 'string', nullable: true, typecast: UtmTags::class)]
+    protected ?UtmTags $utmTags = null;
 
     #[Column(type: 'datetime')]
     protected \DateTimeImmutable $createdAt;
@@ -294,6 +298,25 @@ abstract class Campaign
     public function setEnableUtmTags(bool $enableUtmTags): self
     {
         $this->enableUtmTags = $enableUtmTags;
+
+        return $this;
+    }
+
+    /**
+     * @return UtmTags|null
+     */
+    public function getUtmTags(): ?UtmTags
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param UtmTags|null $utmTags
+     * @return self
+     */
+    public function setUtmTags(?UtmTags $utmTags): self
+    {
+        $this->utmTags = $utmTags;
 
         return $this;
     }
