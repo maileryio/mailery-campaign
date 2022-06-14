@@ -14,6 +14,7 @@ namespace Mailery\Campaign\Entity;
 
 use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
+use Cycle\Annotated\Annotation\Relation\HasOne;
 use Cycle\Annotated\Annotation\Relation\ManyToMany;
 use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Mailery\Brand\Entity\Brand;
@@ -84,6 +85,9 @@ abstract class Campaign
 
     #[Column(type: 'string', nullable: true, typecast: UtmTags::class)]
     protected ?UtmTags $utmTags = null;
+
+    #[HasOne(target: Schedule::class, load: 'eager')]
+    protected ?Schedule $schedule;
 
     #[Column(type: 'datetime')]
     protected \DateTimeImmutable $createdAt;
@@ -317,6 +321,25 @@ abstract class Campaign
     public function setUtmTags(?UtmTags $utmTags): self
     {
         $this->utmTags = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * @return Schedule|null
+     */
+    public function getSchedule(): ?Schedule
+    {
+        return $this->schedule;
+    }
+
+    /**
+     * @param Schedule $schedule
+     * @return self
+     */
+    public function setSchedule(Schedule $schedule): self
+    {
+        $this->schedule = $schedule;
 
         return $this;
     }
