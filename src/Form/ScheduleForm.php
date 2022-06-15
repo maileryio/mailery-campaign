@@ -4,6 +4,7 @@ namespace Mailery\Campaign\Form;
 
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Field\SendingType;
+use Mailery\User\Service\CurrentUserService;
 use Yiisoft\Form\FormModel;
 use Yiisoft\Validator\Rule\Required;
 
@@ -26,10 +27,11 @@ class ScheduleForm extends FormModel
     private ?Campaign $entity = null;
 
     /**
-     * @inheritdoc
+     * @param CurrentUserService $currentUser
      */
-    public function __construct()
+    public function __construct(CurrentUserService $currentUser)
     {
+        $this->timezone = $currentUser->getUser()->getTimezone();
         $this->sendingType = SendingType::asInstant();
 
         parent::__construct();
@@ -45,7 +47,7 @@ class ScheduleForm extends FormModel
 
         $new = clone $this;
         $new->entity = $entity;
-        $new->timezone = $schedule?->getTimezone() ?? $new->timezone;
+        $new->timezone = $schedule?->getTimezone();
         $new->sendingType = $entity->getSendingType();
 
         return $new;
