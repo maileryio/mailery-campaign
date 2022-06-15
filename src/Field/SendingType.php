@@ -4,13 +4,11 @@ namespace Mailery\Campaign\Field;
 
 use Yiisoft\Translator\TranslatorInterface;
 
-class CampaignStatus
+class SendingType
 {
-    private const DRAFT = 'draft';
+
+    private const INSTANT = 'instant';
     private const SCHEDULED = 'scheduled';
-    private const QUEUED = 'queued';
-    private const SENDING = 'sending';
-    private const SENT = 'sent';
 
     /**
      * @var TranslatorInterface|null
@@ -42,11 +40,8 @@ class CampaignStatus
     public static function getKeys(): array
     {
         return [
-            self::DRAFT,
+            self::INSTANT,
             self::SCHEDULED,
-            self::QUEUED,
-            self::SENDING,
-            self::SENT,
         ];
     }
 
@@ -62,9 +57,9 @@ class CampaignStatus
     /**
      * @return self
      */
-    public static function asDraft(): self
+    public static function asInstant(): self
     {
-        return new self(self::DRAFT);
+        return new self(self::INSTANT);
     }
 
     /**
@@ -73,30 +68,6 @@ class CampaignStatus
     public static function asScheduled(): self
     {
         return new self(self::SCHEDULED);
-    }
-
-    /**
-     * @return self
-     */
-    public static function asQueued(): self
-    {
-        return new self(self::QUEUED);
-    }
-
-    /**
-     * @return self
-     */
-    public static function asSending(): self
-    {
-        return new self(self::SENDING);
-    }
-
-    /**
-     * @return self
-     */
-    public static function asSent(): self
-    {
-        return new self(self::SENT);
     }
 
     /**
@@ -132,11 +103,8 @@ class CampaignStatus
         };
 
         return [
-            self::DRAFT => $fnTranslate('Draft'),
-            self::SCHEDULED => $fnTranslate('Scheduled'),
-            self::QUEUED => $fnTranslate('Queued'),
-            self::SENDING => $fnTranslate('Sending'),
-            self::SENT => $fnTranslate('Sent'),
+            self::INSTANT => $fnTranslate('Send immediately'),
+            self::SCHEDULED => $fnTranslate('Send later'),
         ][$this->value] ?? 'Unknown';
     }
 
@@ -146,20 +114,17 @@ class CampaignStatus
     public function getCssClass(): string
     {
         return [
-            self::DRAFT => 'badge-secondary',
+            self::INSTANT => 'badge-secondary',
             self::SCHEDULED => 'badge-warning',
-            self::QUEUED => 'badge-info',
-            self::SENDING => 'badge-info',
-            self::SENT => 'badge-success',
         ][$this->value] ?? 'badge-secondary';
     }
 
     /**
      * @return bool
      */
-    public function isDraft(): bool
+    public function isInstant(): bool
     {
-        return $this->getValue() === self::DRAFT;
+        return $this->getValue() === self::INSTANT;
     }
 
     /**
@@ -170,27 +135,4 @@ class CampaignStatus
         return $this->getValue() === self::SCHEDULED;
     }
 
-    /**
-     * @return bool
-     */
-    public function isQueued(): bool
-    {
-        return $this->getValue() === self::QUEUED;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSending(): bool
-    {
-        return $this->getValue() === self::SENDING;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSent(): bool
-    {
-        return $this->getValue() === self::SENT;
-    }
 }

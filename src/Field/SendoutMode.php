@@ -17,9 +17,13 @@ class SendoutMode
     /**
      * @param string $value
      */
-    public function __construct(
+    private function __construct(
         private string $value
-    ) {}
+    ) {
+        if (!in_array($value, self::getKeys())) {
+            throw new \InvalidArgumentException('Invalid passed value: ' . $value);
+        }
+    }
 
     /**
      * @return string
@@ -27,6 +31,17 @@ class SendoutMode
     public function __toString(): string
     {
         return $this->value;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getKeys(): array
+    {
+        return [
+            self::NORMAL,
+            self::TEST,
+        ];
     }
 
     /**

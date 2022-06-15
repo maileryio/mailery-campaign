@@ -28,6 +28,7 @@ use Cycle\ORM\Entity\Behavior;
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Field\CampaignStatus;
+use Mailery\Campaign\Field\SendingType;
 use Mailery\Campaign\Field\UtmTags;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 
@@ -85,6 +86,9 @@ abstract class Campaign
 
     #[Column(type: 'string', nullable: true, typecast: UtmTags::class)]
     protected ?UtmTags $utmTags = null;
+
+    #[Column(type: 'enum(instant, scheduled)', default: 'instant', typecast: SendingType::class)]
+    protected SendingType $sendingType;
 
     #[HasOne(target: Schedule::class, load: 'eager')]
     protected ?Schedule $schedule;
@@ -321,6 +325,25 @@ abstract class Campaign
     public function setUtmTags(?UtmTags $utmTags): self
     {
         $this->utmTags = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * @return SendingType|null
+     */
+    public function getSendingType(): ?SendingType
+    {
+        return $this->sendingType;
+    }
+
+    /**
+     * @param SendingType|null $sendingType
+     * @return self
+     */
+    public function setSendingType(?SendingType $sendingType): self
+    {
+        $this->sendingType = $sendingType;
 
         return $this;
     }
