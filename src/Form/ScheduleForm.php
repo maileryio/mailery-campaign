@@ -4,12 +4,19 @@ namespace Mailery\Campaign\Form;
 
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Field\SendingType;
+use Mailery\Common\Model\Timezones;
 use Mailery\User\Service\CurrentUserService;
 use Yiisoft\Form\FormModel;
 use Yiisoft\Validator\Rule\Required;
+use Yiisoft\Validator\Rule\InRange;
 
 class ScheduleForm extends FormModel
 {
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    private string $datetime;
 
     /**
      * @var string
@@ -47,6 +54,7 @@ class ScheduleForm extends FormModel
 
         $new = clone $this;
         $new->entity = $entity;
+        $new->datetime = $schedule?->getDatetime();
         $new->timezone = $schedule?->getTimezone();
         $new->sendingType = $entity->getSendingType();
 
@@ -98,6 +106,7 @@ class ScheduleForm extends FormModel
     {
         return [
             'sendingType' => 'Sending type',
+            'datetime' => 'Datetime',
             'timezone' => 'Timezone',
         ];
     }
@@ -108,8 +117,16 @@ class ScheduleForm extends FormModel
     public function getRules(): array
     {
         return [
+            'sendingType' => [
+                Required::rule(),
+                InRange::rule(array_keys($this->getSendingTypeListOptions())),
+            ],
+            'datetime' => [
+                Required::rule(),
+            ],
             'timezone' => [
                 Required::rule(),
+                InRange::rule(array_keys($this->getTimezoneListOptions())),
             ],
         ];
     }
@@ -126,6 +143,14 @@ class ScheduleForm extends FormModel
             $instant->getValue() => $instant->getLabel(),
             $scheduled->getValue() => $scheduled->getLabel(),
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getTimezoneListOptions(): array
+    {
+        return (new Timezones())->getAll();
     }
 
 }

@@ -34,11 +34,11 @@ class Schedule implements LoggableEntityInterface
     #[BelongsTo(target: Campaign::class)]
     private Campaign $campaign;
 
+    #[Column(type: 'datetime')]
+    private \DateTimeImmutable $datetime;
+
     #[Column(type: 'string')]
     private string $timezone;
-
-    #[Column(type: 'datetime')]
-    private \DateTimeImmutable $scheduledAt;
 
     #[Column(type: 'datetime')]
     private \DateTimeImmutable $createdAt;
@@ -93,6 +93,25 @@ class Schedule implements LoggableEntityInterface
     }
 
     /**
+     * @return \DateTimeImmutable
+     */
+    public function getDatetime(): \DateTimeImmutable
+    {
+        return $this->datetime;
+    }
+
+    /**
+     * @param \DateTimeImmutable $datetime
+     * @return self
+     */
+    public function setDatetime(\DateTimeImmutable $datetime): self
+    {
+        $this->datetime = $datetime;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getTimezone(): string
@@ -107,25 +126,6 @@ class Schedule implements LoggableEntityInterface
     public function setTimezone(string $timezone): self
     {
         $this->timezone = $timezone;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getScheduledAt(): \DateTimeImmutable
-    {
-        return $this->scheduledAt;
-    }
-
-    /**
-     * @param \DateTimeImmutable $scheduledAt
-     * @return self
-     */
-    public function setScheduledAt(\DateTimeImmutable $scheduledAt): self
-    {
-        $this->scheduledAt = $scheduledAt;
 
         return $this;
     }
