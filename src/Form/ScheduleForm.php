@@ -7,16 +7,26 @@ use Mailery\Campaign\Field\SendingType;
 use Mailery\Common\Model\Timezones;
 use Mailery\User\Service\CurrentUserService;
 use Yiisoft\Form\FormModel;
+use Yiisoft\Validator\Result;
+use Yiisoft\Validator\Rule\Callback;
 use Yiisoft\Validator\Rule\Required;
 use Yiisoft\Validator\Rule\InRange;
 
 class ScheduleForm extends FormModel
 {
 
+    private const DATE_FORMAT = 'Y-m-d';
+    private const TIME_FORMAT = 'H:i';
+
     /**
-     * @var \DateTimeImmutable
+     * @var string|null
      */
-    private string $datetime;
+    private ?string $date = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $time = null;
 
     /**
      * @var string
@@ -38,7 +48,11 @@ class ScheduleForm extends FormModel
      */
     public function __construct(CurrentUserService $currentUser)
     {
-        $this->timezone = $currentUser->getUser()->getTimezone();
+        $datetime = (new \DateTimeImmutable('now'))->modify('+1 hour');
+
+        $this->date = $datetime->format(self::DATE_FORMAT);
+        $this->time = $datetime->format(self::TIME_FORMAT);
+        $this->timezone = $currentUser->getUser()?->getTimezone();
         $this->sendingType = SendingType::asInstant();
 
         parent::__construct();
@@ -50,13 +64,15 @@ class ScheduleForm extends FormModel
      */
     public function withEntity(Campaign $entity): self
     {
-        $schedule = $entity->getSchedule();
-
         $new = clone $this;
         $new->entity = $entity;
-        $new->datetime = $schedule?->getDatetime();
-        $new->timezone = $schedule?->getTimezone();
         $new->sendingType = $entity->getSendingType();
+
+        if (($schedule = $entity->getSchedule()) !== null) {
+            $new->date = $schedule->getDatetime()->format(self::DATE_FORMAT);
+            $new->time = $schedule->getDatetime()->format(self::TIME_FORMAT);
+            $new->timezone = $schedule->getTimezone();
+        }
 
         return $new;
     }
@@ -92,6 +108,17 @@ class ScheduleForm extends FormModel
     }
 
     /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getDatetime(): ?\DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromFormat(
+            implode(' ', [self::DATE_FORMAT, self::TIME_FORMAT]),
+            implode(' ', [$this->date, $this->time])
+        );
+    }
+
+    /**
      * @return string
      */
     public function getTimezone(): string
@@ -106,8 +133,19 @@ class ScheduleForm extends FormModel
     {
         return [
             'sendingType' => 'Sending type',
-            'datetime' => 'Datetime',
+            'date' => 'Date',
+            'time' => 'Send time',
             'timezone' => 'Timezone',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributeHints(): array
+    {
+        return [
+            'timezone' => 'Current GMT Time Jun 17, 2022, 07:54:09 pm • Change this option if your targeted contacts are in a timezone different from yours. This is useful if you have country-specific contact lists.',
         ];
     }
 
@@ -121,8 +159,40 @@ class ScheduleForm extends FormModel
                 Required::rule(),
                 InRange::rule(array_keys($this->getSendingTypeListOptions())),
             ],
-            'datetime' => [
+            'date' => [
                 Required::rule(),
+                Callback::rule(function (string $value) {
+                    $result = new Result();
+                    $date = \DateTime::createFromFormat(self::DATE_FORMAT, $value);
+
+                    if (!$date || $date->format(self::DATE_FORMAT) !== $value) {
+                        $result->addError('Invalid date value.');
+                    }
+                    return $result;
+                }),
+                Callback::rule(function () {
+                    $result = new Result();
+                    $date = $this->getDatetime();
+                    $now = new \DateTime();
+
+                    if ($date < $now) {
+                        $result->addError('Date cannot be in the past.', ['date']);
+                    }
+
+                    return $result;
+                }),
+            ],
+            'time' => [
+                Required::rule(),
+                Callback::rule(function (string $value) {
+                    $result = new Result();
+                    $date = \DateTime::createFromFormat(self::TIME_FORMAT, $value);
+
+                    if (!$date || $date->format(self::TIME_FORMAT) !== $value) {
+                        $result->addError('Invalid time value.');
+                    }
+                    return $result;
+                }),
             ],
             'timezone' => [
                 Required::rule(),
