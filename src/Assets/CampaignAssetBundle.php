@@ -43,6 +43,5 @@ class CampaignAssetBundle extends AssetBundle
      */
     public array $depends = [
         VueAssetBundle::class,
-        MomentAssetBundle::class,
     ];
 }

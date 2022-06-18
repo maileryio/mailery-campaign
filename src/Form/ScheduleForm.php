@@ -4,6 +4,7 @@ namespace Mailery\Campaign\Form;
 
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Field\SendingType;
+use Mailery\Common\Field\Timezone;
 use Mailery\Common\Model\Timezones;
 use Mailery\User\Service\CurrentUserService;
 use Yiisoft\Form\FormModel;
@@ -31,6 +32,11 @@ class ScheduleForm extends FormModel
     /**
      * @var string
      */
+    private string $country;
+
+    /**
+     * @var string
+     */
     private string $timezone;
 
      /**
@@ -52,7 +58,8 @@ class ScheduleForm extends FormModel
 
         $this->date = $datetime->format(self::DATE_FORMAT);
         $this->time = $datetime->format(self::TIME_FORMAT);
-        $this->timezone = $currentUser->getUser()?->getTimezone();
+        $this->country = $currentUser->getUser()->getCountry();
+        $this->timezone = $currentUser->getUser()->getTimezone();
         $this->sendingType = SendingType::asInstant();
 
         parent::__construct();
@@ -119,11 +126,11 @@ class ScheduleForm extends FormModel
     }
 
     /**
-     * @return string
+     * @return Timezone
      */
-    public function getTimezone(): string
+    public function getTimezone(): Timezone
     {
-        return $this->timezone;
+        return Timezone::typecast($this->timezone);
     }
 
     /**
@@ -136,16 +143,6 @@ class ScheduleForm extends FormModel
             'date' => 'Date',
             'time' => 'Send time',
             'timezone' => 'Timezone',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributeHints(): array
-    {
-        return [
-            'timezone' => 'Current GMT Time Jun 17, 2022, 07:54:09 pm • Change this option if your targeted contacts are in a timezone different from yours. This is useful if you have country-specific contact lists.',
         ];
     }
 
@@ -220,7 +217,10 @@ class ScheduleForm extends FormModel
      */
     public function getTimezoneListOptions(): array
     {
-        return (new Timezones())->getAll();
+        return (new Timezones())
+            ->withOffset(true)
+            ->withNearestBy($this->country)
+            ->getAll();
     }
 
 }
