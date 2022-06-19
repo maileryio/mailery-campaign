@@ -23,7 +23,7 @@ class CampaignStatus
     private function __construct(
         private string $value
     ) {
-        if (!in_array($value, self::getKeys())) {
+        if (!in_array($value, $this->getValues())) {
             throw new \InvalidArgumentException('Invalid passed value: ' . $value);
         }
     }
@@ -34,20 +34,6 @@ class CampaignStatus
     public function __toString(): string
     {
         return $this->value;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getKeys(): array
-    {
-        return [
-            self::DRAFT,
-            self::SCHEDULED,
-            self::QUEUED,
-            self::SENDING,
-            self::SENT,
-        ];
     }
 
     /**
@@ -117,6 +103,20 @@ class CampaignStatus
     public function getValue(): string
     {
         return $this->value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValues(): array
+    {
+        return [
+            self::DRAFT,
+            self::SCHEDULED,
+            self::QUEUED,
+            self::SENDING,
+            self::SENT,
+        ];
     }
 
     /**
