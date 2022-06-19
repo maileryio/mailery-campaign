@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Mailery\Campaign\Form;
 
@@ -40,9 +40,9 @@ class ScheduleForm extends FormModel
     private string $timezone;
 
      /**
-     * @var SendingType
+     * @var string
      */
-    private SendingType $sendingType;
+    private string $sendingType;
 
     /**
      * @var Campaign|null
@@ -54,13 +54,16 @@ class ScheduleForm extends FormModel
      */
     public function __construct(CurrentUserService $currentUser)
     {
-        $datetime = (new \DateTimeImmutable('now'))->modify('+1 hour');
+        $this->country = $currentUser->getUser()->getCountry()->getValue();
+        $this->timezone = $currentUser->getUser()->getTimezone()->getValue();
+        $this->sendingType = SendingType::asInstant()->getValue();
+
+        $datetime = (new \DateTimeImmutable('now'))
+            ->setTimezone($this->getDateTimeZone())
+            ->modify('+1 hour');
 
         $this->date = $datetime->format(self::DATE_FORMAT);
         $this->time = $datetime->format(self::TIME_FORMAT);
-        $this->country = $currentUser->getUser()->getCountry();
-        $this->timezone = $currentUser->getUser()->getTimezone();
-        $this->sendingType = SendingType::asInstant();
 
         parent::__construct();
     }
@@ -73,12 +76,16 @@ class ScheduleForm extends FormModel
     {
         $new = clone $this;
         $new->entity = $entity;
-        $new->sendingType = $entity->getSendingType();
+        $new->sendingType = $entity->getSendingType()->getValue();
 
         if (($schedule = $entity->getSchedule()) !== null) {
-            $new->date = $schedule->getDatetime()->format(self::DATE_FORMAT);
-            $new->time = $schedule->getDatetime()->format(self::TIME_FORMAT);
-            $new->timezone = $schedule->getTimezone();
+            $new->timezone = $schedule->getTimezone()->getValue();
+
+            $datetime = $schedule->getDatetime()->setTimezone($new->getDateTimeZone());
+
+            $new->date = $datetime->format(self::DATE_FORMAT);
+            $new->time = $datetime->format(self::TIME_FORMAT);
+
         }
 
         return $new;
@@ -111,7 +118,7 @@ class ScheduleForm extends FormModel
      */
     public function getSendingType(): SendingType
     {
-        return $this->sendingType;
+        return SendingType::typecast($this->sendingType);
     }
 
     /**
@@ -121,8 +128,17 @@ class ScheduleForm extends FormModel
     {
         return \DateTimeImmutable::createFromFormat(
             implode(' ', [self::DATE_FORMAT, self::TIME_FORMAT]),
-            implode(' ', [$this->date, $this->time])
+            implode(' ', [$this->date, $this->time]),
+            $this->getDateTimeZone()
         );
+    }
+
+    /**
+     * @return \DateTimeZone
+     */
+    public function getDateTimeZone(): \DateTimeZone
+    {
+        return new \DateTimeZone($this->getTimezone()->getValue());
     }
 
     /**
@@ -160,7 +176,7 @@ class ScheduleForm extends FormModel
                 Required::rule(),
                 Callback::rule(function (string $value) {
                     $result = new Result();
-                    $date = \DateTime::createFromFormat(self::DATE_FORMAT, $value);
+                    $date = \DateTime::createFromFormat(self::DATE_FORMAT, $value, $this->getDateTimeZone());
 
                     if (!$date || $date->format(self::DATE_FORMAT) !== $value) {
                         $result->addError('Invalid date value.');
@@ -170,7 +186,7 @@ class ScheduleForm extends FormModel
                 Callback::rule(function () {
                     $result = new Result();
                     $date = $this->getDatetime();
-                    $now = new \DateTime();
+                    $now = (new \DateTimeImmutable())->setTimezone($this->getDateTimeZone());
 
                     if ($date < $now) {
                         $result->addError('Date cannot be in the past.', ['date']);
@@ -183,7 +199,7 @@ class ScheduleForm extends FormModel
                 Required::rule(),
                 Callback::rule(function (string $value) {
                     $result = new Result();
-                    $date = \DateTime::createFromFormat(self::TIME_FORMAT, $value);
+                    $date = \DateTime::createFromFormat(self::TIME_FORMAT, $value, $this->getDateTimeZone());
 
                     if (!$date || $date->format(self::TIME_FORMAT) !== $value) {
                         $result->addError('Invalid time value.');

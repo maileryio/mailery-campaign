@@ -357,10 +357,10 @@ abstract class Campaign
     }
 
     /**
-     * @param Schedule $schedule
+     * @param Schedule|null $schedule
      * @return self
      */
-    public function setSchedule(Schedule $schedule): self
+    public function setSchedule(?Schedule $schedule): self
     {
         $this->schedule = $schedule;
 

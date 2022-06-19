@@ -3,6 +3,7 @@
 namespace Mailery\Campaign\Entity;
 
 use Mailery\Campaign\Entity\Campaign;
+use Mailery\Common\Field\Timezone;
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
 use Mailery\Activity\Log\Mapper\LoggableMapper;
@@ -37,8 +38,8 @@ class Schedule implements LoggableEntityInterface
     #[Column(type: 'datetime')]
     private \DateTimeImmutable $datetime;
 
-    #[Column(type: 'string')]
-    private string $timezone;
+    #[Column(type: 'string(255)', typecast: Timezone::class)]
+    private Timezone $timezone;
 
     #[Column(type: 'datetime')]
     private \DateTimeImmutable $createdAt;
@@ -112,18 +113,18 @@ class Schedule implements LoggableEntityInterface
     }
 
     /**
-     * @return string
+     * @return Timezone
      */
-    public function getTimezone(): string
+    public function getTimezone(): Timezone
     {
         return $this->timezone;
     }
 
     /**
-     * @param string $timezone
+     * @param Timezone $timezone
      * @return self
      */
-    public function setTimezone(string $timezone): self
+    public function setTimezone(Timezone $timezone): self
     {
         $this->timezone = $timezone;
 

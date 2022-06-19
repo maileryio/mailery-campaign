@@ -2,6 +2,7 @@
 
 namespace Mailery\Campaign\ValueObject;
 
+use Mailery\Common\Field\Timezone;
 use Mailery\Campaign\Form\ScheduleForm;
 use Mailery\Campaign\Field\SendingType;
 
@@ -14,9 +15,9 @@ class ScheduleValueObject
     private \DateTimeImmutable $datetime;
 
     /**
-     * @var string
+     * @var Timezone
      */
-    private string $timezone;
+    private Timezone $timezone;
 
      /**
      * @var SendingType
@@ -54,9 +55,9 @@ class ScheduleValueObject
     }
 
     /**
-     * @return string
+     * @return Timezone
      */
-    public function getTimezone(): string
+    public function getTimezone(): Timezone
     {
         return $this->timezone;
     }
