@@ -43,6 +43,7 @@ class ScheduleCrudService
             ;
 
             $campaign->setStatus(CampaignStatus::asScheduled());
+            $campaign->setSchedule($schedule);
 
             (new EntityWriter($this->orm))->write([$campaign, $schedule]);
         } else if(($schedule = $campaign->getSchedule()) !== null) {
