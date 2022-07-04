@@ -4,8 +4,9 @@ namespace Mailery\Campaign\Recipient\Model;
 
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Subscriber\Entity\Subscriber;
-use Mailery\Channel\Factory\RecipientFactoryInterface;
+use Mailery\Campaign\Recipient\Factory\RecipientFactoryInterface;
 use Mailery\Campaign\Recipient\Model\CallableIterator;
+use Mailery\Campaign\Recipient\Model\IdentificatorInterface as Identificator;
 
 class RecipientIterator extends \AppendIterator
 {
@@ -55,16 +56,14 @@ class RecipientIterator extends \AppendIterator
     }
 
     /**
-     * @param string $identificators
+     * @param Identificator $identificators
      * @return self
      */
-    public function appendIdentificators(string ...$identificators): self
+    public function appendIdentificators(Identificator ...$identificators): self
     {
         $iterator = new \ArrayIterator();
         foreach ($identificators as $identificator) {
-            foreach ($this->recipientFactory->fromIdentificator($identificator) as $recipient) {
-                $iterator->append($recipient);
-            }
+            $iterator->append($this->recipientFactory->fromIdentificator($identificator));
         }
 
         $this->append($iterator);

@@ -34,7 +34,7 @@ class Sendout implements LoggableEntityInterface
     #[Column(type: 'primary')]
     private int $id;
 
-    #[Column(type: 'enum(normal, test)', typecast: SendoutMode::class)]
+    #[Column(type: 'enum(default, test)', typecast: SendoutMode::class)]
     private SendoutMode $mode;
 
     #[Column(type: 'enum(created, pending, finished)', typecast: SendoutStatus::class)]

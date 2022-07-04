@@ -6,7 +6,7 @@ use Yiisoft\Translator\TranslatorInterface;
 
 class SendoutMode
 {
-    private const NORMAL = 'normal';
+    private const DEFAULT = 'default';
     private const TEST = 'test';
 
     /**
@@ -45,9 +45,9 @@ class SendoutMode
     /**
      * @return self
      */
-    public static function asNormal(): self
+    public static function asDefault(): self
     {
-        return new self(self::NORMAL);
+        return new self(self::DEFAULT);
     }
 
     /**
@@ -84,7 +84,7 @@ class SendoutMode
     public function getValues(): array
     {
         return [
-            self::NORMAL,
+            self::DEFAULT,
             self::TEST,
         ];
     }
@@ -102,7 +102,7 @@ class SendoutMode
         };
 
         return [
-            self::NORMAL => $fnTranslate('Normal'),
+            self::DEFAULT => $fnTranslate('Default'),
             self::TEST => $fnTranslate('Test'),
         ][$this->value] ?? 'Unknown';
     }
@@ -110,9 +110,9 @@ class SendoutMode
     /**
      * @return bool
      */
-    public function isNormal(): bool
+    public function isDefault(): bool
     {
-        return $this->getValue() === self::NORMAL;
+        return $this->getValue() === self::DEFAULT;
     }
 
     /**

@@ -22,13 +22,15 @@ use Mailery\Channel\Model\ChannelTypeList;
 use Yiisoft\Router\CurrentRoute;
 use Mailery\Campaign\Field\SendoutMode;
 use Yiisoft\Session\Flash\FlashInterface;
+use Yiisoft\DataResponse\DataResponseFactoryInterface;
+use Yiisoft\DataResponse\Formatter\JsonDataResponseFormatter;
 
 class SendoutController
 {
     /**
      * @param ViewRenderer $viewRenderer
      * @param ResponseFactory $responseFactory
-     * @param UrlGenerator $urlGenerator
+     * @param DataResponseFactoryInterface $dataResponseFactory
      * @param CampaignRepository $campaignRepo
      * @param SendoutCrudService $sendoutCrudService
      * @param BrandLocatorInterface $brandLocator
@@ -36,7 +38,7 @@ class SendoutController
     public function __construct(
         private ViewRenderer $viewRenderer,
         private ResponseFactory $responseFactory,
-        private UrlGenerator $urlGenerator,
+        private DataResponseFactoryInterface $dataResponseFactory,
         private CampaignRepository $campaignRepo,
         private SendoutCrudService $sendoutCrudService,
         BrandLocatorInterface $brandLocator
@@ -52,12 +54,11 @@ class SendoutController
      * @param Request $request
      * @param CurrentRoute $currentRoute
      * @param ValidatorInterface $validator
-     * @param FlashInterface $flash
      * @param SendTestForm $form
      * @param ChannelTypeList $channelTypeList
      * @return Response
      */
-    public function test(Request $request, CurrentRoute $currentRoute, ValidatorInterface $validator, FlashInterface $flash, SendTestForm $form, ChannelTypeList $channelTypeList): Response
+    public function test(Request $request, CurrentRoute $currentRoute, ValidatorInterface $validator, SendTestForm $form, ChannelTypeList $channelTypeList): Response
     {
         $campaignId = $currentRoute->getArgument('id');
         if (empty($campaignId) || ($campaign = $this->campaignRepo->findByPK($campaignId)) === null) {
@@ -65,6 +66,9 @@ class SendoutController
         }
 
         $body = $request->getParsedBody();
+        $channelType = $channelTypeList->findByEntity($campaign->getSender()->getChannel());
+
+        $form = $form->withIdentificatorFactory($channelType->getIdentificatorFactory());
 
         if ($request->getMethod() === Method::POST && $form->load($body) && $validator->validate($form)->isValid()) {
             $sendout = $this->sendoutCrudService->create(
@@ -73,26 +77,28 @@ class SendoutController
                     ->withCampaign($campaign)
             );
 
-            $channelType = $channelTypeList->findByEntity($campaign->getChannel());
             $recipientIterator = $channelType
                 ->getRecipientIterator()
-                ->appendIdentificators($form->getRecipients());
+                ->appendIdentificators(...$form->getIdentificators());
 
             foreach ($recipientIterator as $recipient) {
                 $channelType->getHandler()->handle($sendout, $recipient);
             }
 
-            $flash->add(
-                'success',
-                [
-                    'body' => 'Test message have been sent!',
-                ],
-                true
-            );
+            $data = [
+                'success' => true,
+                'message' => 'Test message have been sent!',
+            ];
+        } else {
+            $messages = $validator->validate($form)->getErrorMessages();
+            $data = [
+                'success' => false,
+                'message' => reset($messages),
+            ];
         }
 
-        return $this->responseFactory
-            ->createResponse(Status::FOUND)
-            ->withHeader(Header::LOCATION, $this->urlGenerator->generate($campaign->getViewRouteName(), $campaign->getViewRouteParams()));
+        return $this->dataResponseFactory
+            ->createResponse($data)
+            ->withResponseFormatter(new JsonDataResponseFormatter());
     }
 }
