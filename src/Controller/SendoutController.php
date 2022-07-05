@@ -11,17 +11,14 @@ use Yiisoft\Http\Status;
 use Yiisoft\Http\Header;
 use Yiisoft\Router\UrlGeneratorInterface as UrlGenerator;
 use Mailery\Campaign\Form\SendTestForm;
+use Mailery\Campaign\Service\SendingService;
+use Mailery\Campaign\Repository\CampaignRepository;
 use Yiisoft\Yii\View\ViewRenderer;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
-use Mailery\Campaign\Repository\CampaignRepository;
 use Mailery\Brand\BrandLocatorInterface;
-use Mailery\Campaign\Service\SendoutCrudService;
-use Mailery\Campaign\ValueObject\SendoutValueObject;
 use Yiisoft\Validator\ValidatorInterface;
 use Mailery\Channel\Model\ChannelTypeList;
 use Yiisoft\Router\CurrentRoute;
-use Mailery\Campaign\Field\SendoutMode;
-use Yiisoft\Session\Flash\FlashInterface;
 use Yiisoft\DataResponse\DataResponseFactoryInterface;
 use Yiisoft\DataResponse\Formatter\JsonDataResponseFormatter;
 
@@ -30,17 +27,19 @@ class SendoutController
     /**
      * @param ViewRenderer $viewRenderer
      * @param ResponseFactory $responseFactory
+     * @param UrlGenerator $urlGenerator
      * @param DataResponseFactoryInterface $dataResponseFactory
      * @param CampaignRepository $campaignRepo
-     * @param SendoutCrudService $sendoutCrudService
+     * @param SendingService $sendingService
      * @param BrandLocatorInterface $brandLocator
      */
     public function __construct(
         private ViewRenderer $viewRenderer,
         private ResponseFactory $responseFactory,
+        private UrlGenerator $urlGenerator,
         private DataResponseFactoryInterface $dataResponseFactory,
         private CampaignRepository $campaignRepo,
-        private SendoutCrudService $sendoutCrudService,
+        private SendingService $sendingService,
         BrandLocatorInterface $brandLocator
     ) {
         $this->viewRenderer = $viewRenderer
@@ -48,6 +47,27 @@ class SendoutController
             ->withViewPath(dirname(dirname(__DIR__)) . '/views');
 
         $this->campaignRepo = $campaignRepo->withBrand($brandLocator->getBrand());
+    }
+
+    /**
+     * @param Request $request
+     * @param CurrentRoute $currentRoute
+     * @return Response
+     */
+    public function create(Request $request, CurrentRoute $currentRoute): Response
+    {
+        $campaignId = $currentRoute->getArgument('id');
+        if (empty($campaignId) || ($campaign = $this->campaignRepo->findByPK($campaignId)) === null) {
+            return $this->responseFactory->createResponse(Status::NOT_FOUND);
+        }
+
+        if ($request->getMethod() === Method::POST) {
+            $this->sendingService->sendInstant($campaign);
+        }
+
+        return $this->responseFactory
+            ->createResponse(Status::SEE_OTHER)
+            ->withHeader(Header::LOCATION, $_SERVER['HTTP_REFERER'] ?? $this->urlGenerator->generate($campaign->getViewRouteName(), $campaign->getViewRouteParams()));
     }
 
     /**
@@ -71,19 +91,7 @@ class SendoutController
         $form = $form->withIdentificatorFactory($channelType->getIdentificatorFactory());
 
         if ($request->getMethod() === Method::POST && $form->load($body) && $validator->validate($form)->isValid()) {
-            $sendout = $this->sendoutCrudService->create(
-                (new SendoutValueObject())
-                    ->withMode(SendoutMode::asTest())
-                    ->withCampaign($campaign)
-            );
-
-            $recipientIterator = $channelType
-                ->getRecipientIterator()
-                ->appendIdentificators(...$form->getIdentificators());
-
-            foreach ($recipientIterator as $recipient) {
-                $channelType->getHandler()->handle($sendout, $recipient);
-            }
+            $this->sendingService->sendTest($campaign, ...$form->getIdentificators());
 
             $data = [
                 'success' => true,

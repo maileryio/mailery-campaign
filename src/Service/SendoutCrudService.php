@@ -33,4 +33,20 @@ class SendoutCrudService
 
         return $sendout;
     }
+
+    /**
+     * @param Sendout $sendout
+     * @param SendoutValueObject $valueObject
+     * @return Sendout
+     */
+    public function update(Sendout $sendout, SendoutValueObject $valueObject): Sendout
+    {
+        $sendout = $sendout
+            ->setStatus($valueObject->getStatus())
+        ;
+
+        (new EntityWriter($this->orm))->write([$sendout]);
+
+        return $sendout;
+    }
 }

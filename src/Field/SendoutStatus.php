@@ -9,6 +9,7 @@ class SendoutStatus
     private const CREATED = 'created';
     private const PENDING = 'pending';
     private const FINISHED = 'finished';
+    private const ERRORED = 'errored';
 
     /**
      * @var TranslatorInterface|null
@@ -68,6 +69,14 @@ class SendoutStatus
     }
 
     /**
+     * @return self
+     */
+    public static function asErrored(): self
+    {
+        return new self(self::ERRORED);
+    }
+
+    /**
      * @param TranslatorInterface $translator
      * @return self
      */
@@ -96,6 +105,7 @@ class SendoutStatus
             self::CREATED,
             self::PENDING,
             self::FINISHED,
+            self::ERRORED,
         ];
     }
 
@@ -115,6 +125,7 @@ class SendoutStatus
             self::CREATED => $fnTranslate('Created'),
             self::PENDING => $fnTranslate('Pending'),
             self::FINISHED => $fnTranslate('Finished'),
+            self::ERRORED => $fnTranslate('Errored'),
         ][$this->value] ?? 'Unknown';
     }
 
@@ -127,6 +138,7 @@ class SendoutStatus
             self::CREATED => 'badge-warning',
             self::PENDING => 'badge-info',
             self::FINISHED => 'badge-success',
+            self::ERRORED => 'badge-danger',
         ][$this->value] ?? 'badge-secondary';
     }
 
@@ -152,5 +164,13 @@ class SendoutStatus
     public function isFinished(): bool
     {
         return $this->getValue() === self::FINISHED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isErrored(): bool
+    {
+        return $this->getValue() === self::ERRORED;
     }
 }

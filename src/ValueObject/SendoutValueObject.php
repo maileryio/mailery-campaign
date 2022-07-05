@@ -3,7 +3,9 @@
 namespace Mailery\Campaign\ValueObject;
 
 use Mailery\Campaign\Entity\Campaign;
+use Mailery\Campaign\Entity\Sendout;
 use Mailery\Campaign\Field\SendoutMode;
+use Mailery\Campaign\Field\SendoutStatus;
 
 class SendoutValueObject
 {
@@ -13,9 +15,28 @@ class SendoutValueObject
     private SendoutMode $mode;
 
     /**
+     * @var SendoutStatus
+     */
+    private SendoutStatus $status;
+
+    /**
      * @var Campaign
      */
     private Campaign $campaign;
+
+    /**
+     * @param Sendout $entity
+     * @return self
+     */
+    public static function fromEntity(Sendout $entity): self
+    {
+        $new = new self();
+        $new->mode = $entity->getMode();
+        $new->status = $entity->getStatus();
+        $new->campaign = $entity->getCampaign();
+
+        return $new;
+    }
 
     /**
      * @param SendoutMode $mode
@@ -25,6 +46,18 @@ class SendoutValueObject
     {
         $new = clone $this;
         $new->mode = $mode;
+
+        return $new;
+    }
+
+    /**
+     * @param SendoutStatus $status
+     * @return self
+     */
+    public function withStatus(SendoutStatus $status): self
+    {
+        $new = clone $this;
+        $new->status = $status;
 
         return $new;
     }
@@ -50,10 +83,50 @@ class SendoutValueObject
     }
 
     /**
+     * @return SendoutStatus
+     */
+    public function getStatus(): SendoutStatus
+    {
+        return $this->status;
+    }
+
+    /**
      * @return Campaign
      */
     public function getCampagn(): Campaign
     {
         return $this->campaign;
+    }
+
+    /**
+     * @return self
+     */
+    public function asCreated(): self
+    {
+        return $this->withStatus($this->status->asCreated());
+    }
+
+    /**
+     * @return self
+     */
+    public function asPending(): self
+    {
+        return $this->withStatus($this->status->asPending());
+    }
+
+    /**
+     * @return self
+     */
+    public function asFinished(): self
+    {
+        return $this->withStatus($this->status->asFinished());
+    }
+
+    /**
+     * @return self
+     */
+    public function asErrored(): self
+    {
+        return $this->withStatus($this->status->asErrored());
     }
 }

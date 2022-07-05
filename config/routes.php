@@ -14,6 +14,10 @@ return [
                 ->name('/campaign/default/index')
                 ->action([DefaultController::class, 'index']),
 
+            Route::methods(['POST'], '/campaign/sendout/create/{id:\d+}')
+                ->name('/campaign/sendout/create')
+                ->action([SendoutController::class, 'create']),
+
             Route::methods(['POST'], '/campaign/sendout/test/{id:\d+}')
                 ->name('/campaign/sendout/test')
                 ->action([SendoutController::class, 'test']),

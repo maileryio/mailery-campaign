@@ -29,7 +29,7 @@ class RecipientIterator extends \AppendIterator
     {
         foreach ($groups as $group) {
             $this->append(new CallableIterator(
-                $group->getSubscribers(),
+                $group->getSubscribers()->getIterator(),
                 function (Subscriber $subscriber) {
                     return $this->recipientFactory->fromSubscriber($subscriber);
                 }
@@ -45,12 +45,12 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendSubscribers(Subscriber ...$subscribers): self
     {
-        $iterator = new \ArrayIterator();
-        foreach ($subscribers as $subscriber) {
-            $iterator->append($this->recipientFactory->fromSubscriber($subscriber));
-        }
-
-        $this->append($iterator);
+        $this->append(new CallableIterator(
+            new \ArrayIterator($subscribers),
+            function (Subscriber $subscriber) {
+                return $this->recipientFactory->fromSubscriber($subscriber);
+            }
+        ));
 
         return $this;
     }
@@ -61,12 +61,12 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendIdentificators(Identificator ...$identificators): self
     {
-        $iterator = new \ArrayIterator();
-        foreach ($identificators as $identificator) {
-            $iterator->append($this->recipientFactory->fromIdentificator($identificator));
-        }
-
-        $this->append($iterator);
+        $this->append(new CallableIterator(
+            new \ArrayIterator($identificators),
+            function (Identificator $identificator) {
+                return $this->recipientFactory->fromIdentificator($identificator);
+            }
+        ));
 
         return $this;
     }

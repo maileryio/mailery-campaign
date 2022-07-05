@@ -11,6 +11,7 @@ class CampaignStatus
     private const QUEUED = 'queued';
     private const SENDING = 'sending';
     private const SENT = 'sent';
+    private const ERRORED = 'errored';
 
     /**
      * @var TranslatorInterface|null
@@ -86,6 +87,14 @@ class CampaignStatus
     }
 
     /**
+     * @return self
+     */
+    public static function asErrored(): self
+    {
+        return new self(self::ERRORED);
+    }
+
+    /**
      * @param TranslatorInterface $translator
      * @return self
      */
@@ -116,6 +125,7 @@ class CampaignStatus
             self::QUEUED,
             self::SENDING,
             self::SENT,
+            self::ERRORED,
         ];
     }
 
@@ -137,6 +147,7 @@ class CampaignStatus
             self::QUEUED => $fnTranslate('Queued'),
             self::SENDING => $fnTranslate('Sending'),
             self::SENT => $fnTranslate('Sent'),
+            self::ERRORED => $fnTranslate('Errored'),
         ][$this->value] ?? 'Unknown';
     }
 
@@ -151,6 +162,7 @@ class CampaignStatus
             self::QUEUED => 'badge-info',
             self::SENDING => 'badge-info',
             self::SENT => 'badge-success',
+            self::ERRORED => 'badge-danger',
         ][$this->value] ?? 'badge-secondary';
     }
 
@@ -192,5 +204,13 @@ class CampaignStatus
     public function isSent(): bool
     {
         return $this->getValue() === self::SENT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isErrored(): bool
+    {
+        return $this->getValue() === self::ERRORED;
     }
 }
