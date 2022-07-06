@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Yiisoft\Router\UrlGeneratorInterface;
 use Yiisoft\Definitions\DynamicReference;
+use Mailery\Campaign\Command\ScheduleCommand;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
 
@@ -29,6 +30,12 @@ return [
                     CampaignGroup::class,
                 ],
             ],
+        ],
+    ],
+
+    'yiisoft/yii-console' => [
+        'commands' => [
+            'campaign/schedule' => ScheduleCommand::class,
         ],
     ],
 

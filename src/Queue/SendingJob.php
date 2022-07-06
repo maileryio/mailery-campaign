@@ -43,10 +43,10 @@ class SendingJob
         $this->sendout = $sendout;
         $this->campaign = $sendout->getCampaign();
 
-        $this->campaignCrudService->update(
-            $this->campaign,
-            CampaignValueObject::fromEntity($this->campaign)->asQueued()
-        );
+//        $this->campaignCrudService->update(
+//            $this->campaign,
+//            CampaignValueObject::fromEntity($this->campaign)->asQueued()
+//        );
 
         $this->execute();
     }
@@ -77,10 +77,10 @@ class SendingJob
             SendoutValueObject::fromEntity($this->sendout)->asPending()
         );
 
-        $this->campaignCrudService->update(
-            $this->campaign,
-            CampaignValueObject::fromEntity($this->campaign)->asSending()
-        );
+//        $this->campaignCrudService->update(
+//            $this->campaign,
+//            CampaignValueObject::fromEntity($this->campaign)->asSending()
+//        );
     }
 
     /**
@@ -93,10 +93,10 @@ class SendingJob
             SendoutValueObject::fromEntity($this->sendout)->asFinished()
         );
 
-        $this->campaignCrudService->update(
-            $this->campaign,
-            CampaignValueObject::fromEntity($this->campaign)->asSent()
-        );
+//        $this->campaignCrudService->update(
+//            $this->campaign,
+//            CampaignValueObject::fromEntity($this->campaign)->asSent()
+//        );
     }
 
     /**
@@ -109,10 +109,10 @@ class SendingJob
             SendoutValueObject::fromEntity($this->sendout)->asErrored()
         );
 
-        $this->campaignCrudService->update(
-            $this->campaign,
-            CampaignValueObject::fromEntity($this->campaign)->asErrored()
-        );
+//        $this->campaignCrudService->update(
+//            $this->campaign,
+//            CampaignValueObject::fromEntity($this->campaign)->asErrored()
+//        );
     }
 
     /**
