@@ -2,7 +2,7 @@
 
 namespace Mailery\Campaign\Service;
 
-use Cycle\ORM\ORMInterface;
+use Cycle\ORM\EntityManagerInterface;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\ValueObject\TrackingValueObject;
 use Yiisoft\Yii\Cycle\Data\Writer\EntityWriter;
@@ -11,10 +11,10 @@ class TrackingCrudService
 {
 
     /**
-     * @param ORMInterface $orm
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private ORMInterface $orm
+        private EntityManagerInterface $entityManager
     ) {}
 
 
@@ -32,7 +32,7 @@ class TrackingCrudService
             ->setUtmTags($valueObject->getUtmTags())
         ;
 
-        (new EntityWriter($this->orm))->write([$campaign]);
+        (new EntityWriter($this->entityManager))->write([$campaign]);
 
         return $campaign;
     }

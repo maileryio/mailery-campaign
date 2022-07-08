@@ -2,7 +2,7 @@
 
 namespace Mailery\Campaign\Service;
 
-use Cycle\ORM\ORMInterface;
+use Cycle\ORM\EntityManagerInterface;
 use Mailery\Campaign\Entity\Sendout;
 use Mailery\Campaign\Field\SendoutStatus;
 use Mailery\Campaign\ValueObject\SendoutValueObject;
@@ -11,10 +11,10 @@ use Yiisoft\Yii\Cycle\Data\Writer\EntityWriter;
 class SendoutCrudService
 {
     /**
-     * @param ORMInterface $orm
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private ORMInterface $orm
+        private EntityManagerInterface $entityManager
     ) {}
 
     /**
@@ -29,7 +29,7 @@ class SendoutCrudService
             ->setCampaign($valueObject->getCampagn())
         ;
 
-        (new EntityWriter($this->orm))->write([$sendout]);
+        (new EntityWriter($this->entityManager))->write([$sendout]);
 
         return $sendout;
     }
@@ -45,7 +45,7 @@ class SendoutCrudService
             ->setStatus($valueObject->getStatus())
         ;
 
-        (new EntityWriter($this->orm))->write([$sendout]);
+        (new EntityWriter($this->entityManager))->write([$sendout]);
 
         return $sendout;
     }

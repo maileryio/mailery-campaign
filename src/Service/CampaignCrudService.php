@@ -2,7 +2,7 @@
 
 namespace Mailery\Campaign\Service;
 
-use Cycle\ORM\ORMInterface;
+use Cycle\ORM\EntityManagerInterface;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\ValueObject\CampaignValueObject;
 use Mailery\Brand\Entity\Brand;
@@ -16,10 +16,10 @@ class CampaignCrudService
     private Brand $brand;
 
     /**
-     * @param ORMInterface $orm
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private ORMInterface $orm
+        private EntityManagerInterface $entityManager
     ) {}
 
     /**
@@ -54,7 +54,7 @@ class CampaignCrudService
             $campaign->getGroups()->add($group);
         }
 
-        (new EntityWriter($this->orm))->write([$campaign]);
+        (new EntityWriter($this->entityManager))->write([$campaign]);
 
         return $campaign;
     }
@@ -69,7 +69,7 @@ class CampaignCrudService
              $campaign->getGroups()->removeElement($groupPivot);
         }
 
-        (new EntityWriter($this->orm))->delete([$campaign]);
+        (new EntityWriter($this->entityManager))->delete([$campaign]);
 
         return true;
     }

@@ -2,7 +2,7 @@
 
 namespace Mailery\Campaign\Service;
 
-use Cycle\ORM\ORMInterface;
+use Cycle\ORM\EntityManagerInterface;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\Schedule;
 use Mailery\Campaign\ValueObject\ScheduleValueObject;
@@ -12,10 +12,10 @@ class ScheduleCrudService
 {
 
     /**
-     * @param ORMInterface $orm
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private ORMInterface $orm
+        private EntityManagerInterface $entityManager
     ) {}
 
 
@@ -43,11 +43,12 @@ class ScheduleCrudService
             $campaign->setStatus($campaign->getStatus()->asScheduled());
             $campaign->setSchedule($schedule);
 
-            (new EntityWriter($this->orm))->write([$campaign, $schedule]);
+            (new EntityWriter($this->entityManager))->write([$campaign, $schedule]);
         } else if(($schedule = $campaign->getSchedule()) !== null) {
             $campaign->setSchedule(null);
-            (new EntityWriter($this->orm))->write([$campaign]);
-            (new EntityWriter($this->orm))->delete([$schedule]);
+            $this->entityManager->persist($campaign);
+            $this->entityManager->delete($schedule);
+            $this->entityManager->run();
         }
 
         return $campaign;
@@ -61,10 +62,10 @@ class ScheduleCrudService
         $campaign->setStatus($campaign->getStatus()->asDraft());
         $campaign->setSendingType($campaign->getSendingType()->asInstant());
 
-        (new EntityWriter($this->orm))->write([$campaign]);
+        (new EntityWriter($this->entityManager))->write([$campaign]);
 
         if ($schedule !== null) {
-            (new EntityWriter($this->orm))->delete([$schedule]);
+            (new EntityWriter($this->entityManager))->delete([$schedule]);
         }
 
         return true;

@@ -101,7 +101,7 @@ class CampaignForm extends FormModel
     /**
      * @inheritdoc
      */
-    public function load(array $data, ?string $formName = null): bool
+    public function load(array|object|null $data, ?string $formName = null): bool
     {
         $scope = $formName ?? $this->getFormName();
 
