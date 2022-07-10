@@ -15,6 +15,7 @@ namespace Mailery\Campaign\Entity;
 use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
 use Cycle\Annotated\Annotation\Relation\HasOne;
+use Cycle\Annotated\Annotation\Relation\HasMany;
 use Cycle\Annotated\Annotation\Relation\ManyToMany;
 use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Mailery\Brand\Entity\Brand;
@@ -31,6 +32,7 @@ use Mailery\Campaign\Field\CampaignStatus;
 use Mailery\Campaign\Field\SendingType;
 use Mailery\Campaign\Field\UtmTags;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 * This doc block required for STI/JTI
@@ -67,9 +69,9 @@ abstract class Campaign
     protected Template $template;
 
     #[ManyToMany(target: Group::class, though: CampaignGroup::class, thoughInnerKey: 'campaign_id', thoughOuterKey: 'subscriber_group_id', collection: DoctrineCollectionFactory::class)]
-    protected PivotedCollection $groups;
+    protected ArrayCollection $groups;
 
-    #[Column(type: 'enum(draft, scheduled, queued, sending, sent)', default: 'draft', typecast: CampaignStatus::class)]
+    #[Column(type: 'enum(draft, scheduled, queued, sending, sent, errored)', default: 'draft', typecast: CampaignStatus::class)]
     protected CampaignStatus $status;
 
     #[Column(type: 'string(255)')]
@@ -93,6 +95,9 @@ abstract class Campaign
     #[HasOne(target: Schedule::class, load: 'eager')]
     protected ?Schedule $schedule;
 
+    #[HasMany(target: Sendout::class, collection: DoctrineCollectionFactory::class)]
+    protected ArrayCollection $sendouts;
+
     #[Column(type: 'datetime')]
     protected \DateTimeImmutable $createdAt;
 
@@ -101,7 +106,8 @@ abstract class Campaign
 
     public function __construct()
     {
-        $this->groups = new PivotedCollection();
+        $this->groups = new ArrayCollection();
+        $this->sendouts = new ArrayCollection();
     }
 
     /**
@@ -216,18 +222,18 @@ abstract class Campaign
     }
 
     /**
-     * @return PivotedCollection
+     * @return ArrayCollection
      */
-    public function getGroups(): PivotedCollection
+    public function getGroups(): ArrayCollection
     {
         return $this->groups;
     }
 
     /**
-     * @param PivotedCollection $groups
+     * @param ArrayCollection $groups
      * @return self
      */
-    public function setGroups(PivotedCollection $groups): self
+    public function setGroups(ArrayCollection $groups): self
     {
         $this->groups = $groups;
 
@@ -365,6 +371,33 @@ abstract class Campaign
         $this->schedule = $schedule;
 
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getSendouts(): ArrayCollection
+    {
+        return $this->sendouts;
+    }
+
+    /**
+     * @param ArrayCollection $sendouts
+     * @return self
+     */
+    public function setSendouts(ArrayCollection $sendouts): self
+    {
+        $this->sendouts = $sendouts;
+
+        return $this;
+    }
+
+    /**
+     * @return Sendout|null
+     */
+    public function getLastSendout(): ?Sendout
+    {
+        return $this->getSendouts()->last() ?: null;
     }
 
     /**

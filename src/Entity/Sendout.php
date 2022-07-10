@@ -37,7 +37,7 @@ class Sendout implements LoggableEntityInterface
     #[Column(type: 'enum(default, test)', typecast: SendoutMode::class)]
     private SendoutMode $mode;
 
-    #[Column(type: 'enum(created, pending, finished)', typecast: SendoutStatus::class)]
+    #[Column(type: 'enum(created, pending, finished, errored)', typecast: SendoutStatus::class)]
     private SendoutStatus $status;
 
     #[BelongsTo(target: Campaign::class)]
@@ -45,6 +45,9 @@ class Sendout implements LoggableEntityInterface
 
     #[HasMany(target: Recipient::class)]
     private PivotedCollection $recipients;
+
+    #[Column(type: 'string(255)', nullable: true)]
+    private ?string $error = null;
 
     #[Column(type: 'datetime')]
     private \DateTimeImmutable $createdAt;
@@ -156,6 +159,25 @@ class Sendout implements LoggableEntityInterface
     public function setRecipients(PivotedCollection $recipients): self
     {
         $this->recipients = $recipients;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     * @return self
+     */
+    public function setError(string $error): self
+    {
+        $this->error = $error;
 
         return $this;
     }
