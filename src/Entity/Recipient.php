@@ -44,6 +44,30 @@ class Recipient implements LoggableEntityInterface
     #[RefersTo(target: Subscriber::class, nullable: true)]
     private ?Subscriber $subscriber = null;
 
+    #[Column(type: 'string(255)', nullable: true)]
+    private ?string $error = null;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $sent = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $recieved = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $opened = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $clicked = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $bounced = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $unsubscribed = false;
+
+    #[Column(type: 'boolean', default: false)]
+    protected bool $complained = false;
+
     #[Column(type: 'datetime')]
     private \DateTimeImmutable $createdAt;
 
@@ -151,5 +175,165 @@ class Recipient implements LoggableEntityInterface
         $this->subscriber = $subscriber;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     * @return self
+     */
+    public function setError(string $error): self
+    {
+        $this->error = $error;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSent(): bool
+    {
+        return $this->sent;
+    }
+
+    /**
+     * @param bool $sent
+     * @return self
+     */
+    public function setSent(bool $sent): self
+    {
+        $this->sent = $sent;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRecieved(): bool
+    {
+        return $this->recieved;
+    }
+
+    /**
+     * @param bool $recieved
+     * @return self
+     */
+    public function setRecieved(bool $recieved): self
+    {
+        $this->recieved = $recieved;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOpened(): bool
+    {
+        return $this->opened;
+    }
+
+    /**
+     * @param bool $opened
+     * @return self
+     */
+    public function setOpened(bool $opened): self
+    {
+        $this->opened = $opened;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClicked(): bool
+    {
+        return $this->clicked;
+    }
+
+    /**
+     * @param bool $clicked
+     * @return self
+     */
+    public function setClicked(bool $clicked): self
+    {
+        $this->clicked = $clicked;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBounced(): bool
+    {
+        return $this->bounced;
+    }
+
+    /**
+     * @param bool $bounced
+     * @return self
+     */
+    public function setBounced(bool $bounced): self
+    {
+        $this->bounced = $bounced;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUnsubscribed(): bool
+    {
+        return $this->unsubscribed;
+    }
+
+    /**
+     * @param bool $unsubscribed
+     * @return self
+     */
+    public function setUnsubscribed(bool $unsubscribed): self
+    {
+        $this->unsubscribed = $unsubscribed;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isComplained(): bool
+    {
+        return $this->complained;
+    }
+
+    /**
+     * @param bool $complained
+     * @return self
+     */
+    public function setComplained(bool $complained): self
+    {
+        $this->complained = $complained;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeSend(): bool
+    {
+        return !$this->isSent();
     }
 }

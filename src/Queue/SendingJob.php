@@ -11,6 +11,7 @@ use Mailery\Campaign\Service\SendoutCrudService;
 use Mailery\Campaign\ValueObject\CampaignValueObject;
 use Mailery\Campaign\ValueObject\SendoutValueObject;
 use Mailery\Channel\Model\ChannelTypeList;
+use Mailery\Messenger\Exception\MessengerException;
 
 class SendingJob
 {
@@ -43,10 +44,10 @@ class SendingJob
         $this->sendout = $sendout;
         $this->campaign = $sendout->getCampaign();
 
-//        $this->campaignCrudService->update(
-//            $this->campaign,
-//            CampaignValueObject::fromEntity($this->campaign)->asQueued()
-//        );
+        $this->campaignCrudService->update(
+            $this->campaign,
+            CampaignValueObject::fromEntity($this->campaign)->asQueued()
+        );
 
         $this->execute();
     }
@@ -61,7 +62,7 @@ class SendingJob
             $this->doExecute();
             $this->afterExecute();
         } catch (\Exception $e) {
-            $this->thrownExecute();
+            $this->thrownExecute($e);
 
             throw $e;
         }
@@ -72,15 +73,15 @@ class SendingJob
      */
     private function beforeExecute(): void
     {
-//        $this->sendoutCrudService->update(
-//            $this->sendout,
-//            SendoutValueObject::fromEntity($this->sendout)->asPending()
-//        );
-//
-//        $this->campaignCrudService->update(
-//            $this->campaign,
-//            CampaignValueObject::fromEntity($this->campaign)->asSending()
-//        );
+        $this->sendoutCrudService->update(
+            $this->sendout,
+            SendoutValueObject::fromEntity($this->sendout)->asPending()
+        );
+
+        $this->campaignCrudService->update(
+            $this->campaign,
+            CampaignValueObject::fromEntity($this->campaign)->asSending()
+        );
     }
 
     /**
@@ -88,31 +89,36 @@ class SendingJob
      */
     private function afterExecute(): void
     {
-//        $this->sendoutCrudService->update(
-//            $this->sendout,
-//            SendoutValueObject::fromEntity($this->sendout)->asFinished()
-//        );
-//
-//        $this->campaignCrudService->update(
-//            $this->campaign,
-//            CampaignValueObject::fromEntity($this->campaign)->asSent()
-//        );
+        $this->sendoutCrudService->update(
+            $this->sendout,
+            SendoutValueObject::fromEntity($this->sendout)->asFinished()
+        );
+
+        $this->campaignCrudService->update(
+            $this->campaign,
+            CampaignValueObject::fromEntity($this->campaign)->asSent()
+        );
     }
 
     /**
+     * @param \Exception $e
      * @return void
      */
-    private function thrownExecute(): void
+    private function thrownExecute(\Exception $e): void
     {
-//        $this->sendoutCrudService->update(
-//            $this->sendout,
-//            SendoutValueObject::fromEntity($this->sendout)->asErrored()
-//        );
-//
-//        $this->campaignCrudService->update(
-//            $this->campaign,
-//            CampaignValueObject::fromEntity($this->campaign)->asErrored()
-//        );
+        if ($e instanceof MessengerException) {
+            $this->sendout->setError($e->getUserMessage());
+        }
+
+        $this->sendoutCrudService->update(
+            $this->sendout,
+            SendoutValueObject::fromEntity($this->sendout)->asErrored()
+        );
+
+        $this->campaignCrudService->update(
+            $this->campaign,
+            CampaignValueObject::fromEntity($this->campaign)->asErrored()
+        );
     }
 
     /**
@@ -121,13 +127,18 @@ class SendingJob
     private function doExecute(): void
     {
         $channelType = $this->channelTypeList->findByEntity($this->campaign->getSender()->getChannel());
+        $handler = $channelType->getHandler()->withSuppressErrors(true);
 
         $recipientIterator = $channelType
             ->getRecipientIterator()
             ->appendGroups(...$this->campaign->getGroups()->toArray());
 
         foreach ($recipientIterator as $recipient) {
-            $channelType->getHandler()->handle($this->sendout, $recipient);
+            if (!$recipient->canBeSend()) {
+                continue;
+            }
+
+            $handler->handle($this->sendout, $recipient);
         }
     }
 }
