@@ -17,7 +17,7 @@ class CallableIterator implements \Iterator
     /**
      * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         $currentElement = $this->innerIterator->current();
 
@@ -35,7 +35,7 @@ class CallableIterator implements \Iterator
     /**
      * @return mixed
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->innerIterator->key();
     }

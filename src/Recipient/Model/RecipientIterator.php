@@ -4,6 +4,7 @@ namespace Mailery\Campaign\Recipient\Model;
 
 use Mailery\Subscriber\Entity\Group;
 use Mailery\Subscriber\Entity\Subscriber;
+use Mailery\Subscriber\Repository\SubscriberRepository;
 use Mailery\Campaign\Recipient\Factory\RecipientFactoryInterface;
 use Mailery\Campaign\Recipient\Model\CallableIterator;
 use Mailery\Campaign\Recipient\Model\IdentificatorInterface as Identificator;
@@ -13,10 +14,12 @@ class RecipientIterator extends \AppendIterator
 
     /**
      * @param RecipientFactoryInterface $recipientFactory
+     * @param SubscriberRepository $subscriberRepo
      * @return self
      */
     public function __construct(
-        private RecipientFactoryInterface $recipientFactory
+        private RecipientFactoryInterface $recipientFactory,
+        private SubscriberRepository $subscriberRepo
     ) {
         parent::__construct();
     }
@@ -28,8 +31,16 @@ class RecipientIterator extends \AppendIterator
     public function appendGroups(Group ...$groups): self
     {
         foreach ($groups as $group) {
+            $subscribers = $this->subscriberRepo
+                ->asActive()
+                ->select()
+                ->where([
+                    'groups.id' => $group->getId(),
+                ])
+                ->getIterator();
+
             $this->append(new CallableIterator(
-                $group->getSubscribers()->getIterator(),
+                $subscribers->getIterator(),
                 function (Subscriber $subscriber) {
                     return $this->recipientFactory->fromSubscriber($subscriber);
                 }
@@ -45,6 +56,13 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendSubscribers(Subscriber ...$subscribers): self
     {
+        $subscribers = array_filter(
+            $subscribers,
+            function (Subscriber $subscriber) {
+                return $subscriber->isActive();
+            }
+        );
+
         $this->append(new CallableIterator(
             new \ArrayIterator($subscribers),
             function (Subscriber $subscriber) {

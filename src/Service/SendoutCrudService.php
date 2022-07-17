@@ -43,6 +43,7 @@ class SendoutCrudService
     {
         $sendout = $sendout
             ->setStatus($valueObject->getStatus())
+            ->setError($valueObject->getError())
         ;
 
         (new EntityWriter($this->entityManager))->write([$sendout]);

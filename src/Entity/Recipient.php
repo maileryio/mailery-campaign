@@ -4,9 +4,10 @@ namespace Mailery\Campaign\Entity;
 
 use Mailery\Activity\Log\Entity\LoggableEntityInterface;
 use Mailery\Activity\Log\Entity\LoggableEntityTrait;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
 use Mailery\Subscriber\Entity\Subscriber;
 use Mailery\Campaign\Entity\Sendout;
-use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Mailery\Campaign\Repository\RecipientRepository;
 use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
 use Cycle\Annotated\Annotation\Relation\BelongsTo;
@@ -15,6 +16,7 @@ use Cycle\ORM\Entity\Behavior;
 
 #[Entity(
     table: 'sendout_recipients',
+    repository: RecipientRepository::class,
     mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(
@@ -334,6 +336,10 @@ class Recipient implements LoggableEntityInterface
      */
     public function canBeSend(): bool
     {
+        if ($this->subscriber !== null && !$this->subscriber->isActive()) {
+            return false;
+        }
+
         return !$this->isSent();
     }
 }

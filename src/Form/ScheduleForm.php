@@ -107,7 +107,7 @@ class ScheduleForm extends FormModel
         $scope = $formName ?? $this->getFormName();
 
         if (isset($data[$scope]['sendingType'])) {
-            $data[$scope]['sendingType'] = SendingType::typecast($data[$scope]['sendingType']);
+            $data[$scope]['sendingType'] = SendingType::typecast($data[$scope]['sendingType'])->getValue();
         }
 
         return parent::load($data, $formName);

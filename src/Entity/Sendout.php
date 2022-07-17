@@ -2,18 +2,19 @@
 
 namespace Mailery\Campaign\Entity;
 
+use Mailery\Activity\Log\Entity\LoggableEntityInterface;
+use Mailery\Activity\Log\Entity\LoggableEntityTrait;
+use Mailery\Activity\Log\Mapper\LoggableMapper;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Field\SendoutStatus;
 use Mailery\Campaign\Field\SendoutMode;
-use Mailery\Activity\Log\Entity\LoggableEntityInterface;
-use Mailery\Activity\Log\Entity\LoggableEntityTrait;
-use Cycle\ORM\Collection\Pivoted\PivotedCollection;
-use Mailery\Activity\Log\Mapper\LoggableMapper;
+use Cycle\ORM\Collection\DoctrineCollectionFactory;
 use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
 use Cycle\Annotated\Annotation\Relation\HasMany;
 use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Cycle\ORM\Entity\Behavior;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[Entity(
     table: 'sendouts',
@@ -43,8 +44,8 @@ class Sendout implements LoggableEntityInterface
     #[BelongsTo(target: Campaign::class)]
     private Campaign $campaign;
 
-    #[HasMany(target: Recipient::class)]
-    private PivotedCollection $recipients;
+    #[HasMany(target: Recipient::class, collection: DoctrineCollectionFactory::class)]
+    private ArrayCollection $recipients;
 
     #[Column(type: 'string(255)', nullable: true)]
     private ?string $error = null;
@@ -57,7 +58,7 @@ class Sendout implements LoggableEntityInterface
 
     public function __construct()
     {
-        $this->recipients = new PivotedCollection();
+        $this->recipients = new ArrayCollection();
     }
 
     /**
@@ -145,18 +146,18 @@ class Sendout implements LoggableEntityInterface
     }
 
     /**
-     * @return PivotedCollection
+     * @return ArrayCollection
      */
-    public function getRecipients(): PivotedCollection
+    public function getRecipients(): ArrayCollection
     {
         return $this->recipients;
     }
 
     /**
-     * @param PivotedCollection $recipients
+     * @param ArrayCollection $recipients
      * @return self
      */
-    public function setRecipients(PivotedCollection $recipients): self
+    public function setRecipients(ArrayCollection $recipients): self
     {
         $this->recipients = $recipients;
 
@@ -164,21 +165,29 @@ class Sendout implements LoggableEntityInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getError(): string
+    public function getError(): ?string
     {
         return $this->error;
     }
 
     /**
-     * @param string $error
+     * @param string|null $error
      * @return self
      */
-    public function setError(string $error): self
+    public function setError(?string $error): self
     {
         $this->error = $error;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

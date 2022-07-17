@@ -21,7 +21,6 @@ use Cycle\Annotated\Annotation\Relation\BelongsTo;
 use Mailery\Brand\Entity\Brand;
 use Mailery\Template\Entity\Template;
 use Mailery\Sender\Entity\Sender;
-use Cycle\ORM\Collection\Pivoted\PivotedCollection;
 use Mailery\Campaign\Repository\CampaignRepository;
 use Mailery\Activity\Log\Mapper\LoggableMapper;
 use Cycle\ORM\Collection\DoctrineCollectionFactory;
@@ -395,9 +394,21 @@ abstract class Campaign
     /**
      * @return Sendout|null
      */
-    public function getLastSendout(): ?Sendout
+    public function getLastDefaultSendout(): ?Sendout
     {
-        return $this->getSendouts()->last() ?: null;
+        return $this->getSendouts()->filter(function (Sendout $sendout) {
+            return $sendout->getMode()->isDefault();
+        })->last() ?: null;
+    }
+
+    /**
+     * @return Sendout|null
+     */
+    public function getLastTestSendout(): ?Sendout
+    {
+        return $this->getSendouts()->filter(function (Sendout $sendout) {
+            return $sendout->getMode()->isTest();
+        })->last() ?: null;
     }
 
     /**

@@ -62,7 +62,7 @@ class SendoutController
         }
 
         if ($request->getMethod() === Method::POST) {
-            $this->sendingService->sendInstant($campaign);
+            $this->sendingService->sendQueue($campaign);
         }
 
         return $this->responseFactory
@@ -91,12 +91,20 @@ class SendoutController
         $form = $form->withIdentificatorFactory($channelType->getIdentificatorFactory());
 
         if ($request->getMethod() === Method::POST && $form->load($body) && $validator->validate($form)->isValid()) {
-            $this->sendingService->sendTest($campaign, ...$form->getIdentificators());
+            try {
+                $this->sendingService->sendTest($campaign, ...$form->getIdentificators());
 
-            $data = [
-                'success' => true,
-                'message' => 'Test message have been sent!',
-            ];
+                $data = [
+                    'success' => true,
+                    'message' => 'Test message have been sent!',
+                ];
+            } catch (\Exception $e) {
+                $sendout = $campaign->getLastTestSendout();
+                $data = [
+                    'success' => false,
+                    'message' => $sendout?->getError() ?? 'Server error',
+                ];
+            }
         } else {
             $messages = $validator->validate($form)->getErrorMessages();
             $data = [

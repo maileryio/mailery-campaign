@@ -64,7 +64,7 @@ class ScheduleCommand extends Command
             ->select()
             ->load('schedule')
             ->where([
-                'status' => CampaignStatus::asScheduled(),
+                'status' => CampaignStatus::asScheduled()->getValue(),
             ])
             ->andWhere('schedule.datetime', '<=', $currentDate->format('Y-m-d H:i:s'))
             ->orderBy('schedule.datetime', SelectQuery::SORT_ASC)
@@ -78,7 +78,7 @@ class ScheduleCommand extends Command
 
         foreach ($query->getIterator() as $campaign) {
             $io->info(sprintf('Processing campaign nr. %d [%d]', ++$cnt, $campaign->getId()));
-            $this->sendingService->sendInstant($campaign);
+            $this->sendingService->sendQueue($campaign);
         }
 
         return ExitCode::OK;

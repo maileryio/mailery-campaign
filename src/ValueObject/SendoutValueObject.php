@@ -25,6 +25,11 @@ class SendoutValueObject
     private Campaign $campaign;
 
     /**
+     * @var string|null
+     */
+    private ?string $error = null;
+
+    /**
      * @param Sendout $entity
      * @return self
      */
@@ -34,6 +39,7 @@ class SendoutValueObject
         $new->mode = $entity->getMode();
         $new->status = $entity->getStatus();
         $new->campaign = $entity->getCampaign();
+        $new->error = $entity->getError();
 
         return $new;
     }
@@ -75,6 +81,18 @@ class SendoutValueObject
     }
 
     /**
+     * @param string $error
+     * @return self
+     */
+    public function withError(string $error): self
+    {
+        $new = clone $this;
+        $new->error = $error;
+
+        return $new;
+    }
+
+    /**
      * @return SendoutMode
      */
     public function getMode(): SendoutMode
@@ -96,6 +114,14 @@ class SendoutValueObject
     public function getCampagn(): Campaign
     {
         return $this->campaign;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getError(): ?string
+    {
+        return $this->error;
     }
 
     /**
