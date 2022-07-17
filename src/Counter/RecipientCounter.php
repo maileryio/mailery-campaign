@@ -45,4 +45,59 @@ class RecipientCounter
             ->count();
     }
 
+    /**
+     * @return int
+     */
+    public function getOpenedCount(): int
+    {
+        return $this->repo
+            ->asOpened(true)
+            ->select()
+            ->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function getClickedCount(): int
+    {
+        return $this->repo
+            ->asClicked(true)
+            ->select()
+            ->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnsubscribedCount(): int
+    {
+        return $this->repo
+            ->asUnsubscribed(true)
+            ->select()
+            ->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function getBouncedCount(): int
+    {
+        return $this->repo
+            ->asBounced(true)
+            ->select()
+            ->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function getComplainedCount(): int
+    {
+        return $this->repo
+            ->asComplained(true)
+            ->select()
+            ->count();
+    }
+
 }
