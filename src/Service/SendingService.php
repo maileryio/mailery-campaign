@@ -59,9 +59,6 @@ class SendingService
     {
         $campaign = $sendout->getCampaign();
 
-        $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
-        $handler = $channelType->getHandler()->withSuppressErrors(true);
-
         $sendoutValueObject = SendoutValueObject::fromEntity($sendout);
         $campaignValueObject = CampaignValueObject::fromEntity($campaign);
 
@@ -70,6 +67,9 @@ class SendingService
 
         try {
             try {
+                $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
+                $handler = $channelType->getHandler()->withSuppressErrors(true);
+
                 $recipientIterator = $channelType
                     ->getRecipientIterator()
                     ->appendGroups(...$campaign->getGroups()->toArray());
@@ -107,9 +107,6 @@ class SendingService
      */
     public function sendTest(Campaign $campaign, Identificator ...$identificators): Sendout
     {
-        $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
-        $handler = $channelType->getHandler();
-
         $sendout = $this->sendoutCrudService->create(
             (new SendoutValueObject())
                 ->withMode(SendoutMode::asTest())
@@ -122,6 +119,9 @@ class SendingService
 
         try {
             try {
+                $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
+                $handler = $channelType->getHandler();
+
                 $recipientIterator = $channelType
                     ->getRecipientIterator()
                     ->appendIdentificators(...$identificators);
