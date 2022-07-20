@@ -14,6 +14,7 @@ use Mailery\Campaign\Form\SendTestForm;
 use Mailery\Campaign\Service\SendingService;
 use Mailery\Campaign\Repository\CampaignRepository;
 use Yiisoft\Yii\View\ViewRenderer;
+use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
 use Mailery\Brand\BrandLocatorInterface;
 use Yiisoft\Validator\ValidatorInterface;
@@ -76,9 +77,10 @@ class SendoutController
      * @param ValidatorInterface $validator
      * @param SendTestForm $form
      * @param ChannelTypeList $channelTypeList
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function test(Request $request, CurrentRoute $currentRoute, ValidatorInterface $validator, SendTestForm $form, ChannelTypeList $channelTypeList): Response
+    public function test(Request $request, CurrentRoute $currentRoute, ValidatorInterface $validator, SendTestForm $form, ChannelTypeList $channelTypeList, LoggerInterface $logger): Response
     {
         $campaignId = $currentRoute->getArgument('id');
         if (empty($campaignId) || ($campaign = $this->campaignRepo->findByPK($campaignId)) === null) {
@@ -102,8 +104,10 @@ class SendoutController
                 $sendout = $campaign->getLastTestSendout();
                 $data = [
                     'success' => false,
-                    'message' => $sendout?->getError() ?? 'Server error',
+                    'message' => $sendout?->getError() ?? $e->getMessage(),
                 ];
+
+                $logger->error($e->getMessage(), ['exception' => $e]);
             }
         } else {
             $messages = $validator->validate($form)->getErrorMessages();
