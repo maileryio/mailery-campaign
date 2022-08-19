@@ -12,9 +12,13 @@ declare(strict_types=1);
 
 use Yiisoft\Router\UrlGeneratorInterface;
 use Yiisoft\Definitions\DynamicReference;
-use Mailery\Campaign\Command\ScheduleCommand;
+use Mailery\Campaign\Command\ScheduleCampaignCommand;
+use Mailery\Campaign\Command\SendCampaignCommand;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
+use Mailery\Campaign\Messenger\Message\SendCampaign;
+use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
+use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransport;
 
 return [
     'maileryio/mailery-campaign' => [
@@ -33,9 +37,19 @@ return [
         ],
     ],
 
+    'maileryio/mailery-messenger' => [
+        'handlers' => [
+            SendCampaign::class => [SendCampaignHandler::class],
+        ],
+        'senders' => [
+            SendCampaign::class => [BeanstalkdTransport::class],
+        ],
+    ],
+
     'yiisoft/yii-console' => [
         'commands' => [
-            'campaign/schedule' => ScheduleCommand::class,
+            'campaign/schedule' => ScheduleCampaignCommand::class,
+            'campaign/send' => SendCampaignCommand::class,
         ],
     ],
 

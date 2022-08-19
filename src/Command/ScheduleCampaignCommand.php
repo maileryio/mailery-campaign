@@ -4,16 +4,17 @@ namespace Mailery\Campaign\Command;
 
 use Cycle\Database\Query\SelectQuery;
 use Mailery\Campaign\Field\CampaignStatus;
+use Mailery\Campaign\Messenger\SendCampaign;
 use Mailery\Campaign\Repository\CampaignRepository;
-use Mailery\Campaign\Service\SendingService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Yiisoft\Yii\Console\ExitCode;
 
-class ScheduleCommand extends Command
+class ScheduleCampaignCommand extends Command
 {
     /**
      * @var string
@@ -21,12 +22,12 @@ class ScheduleCommand extends Command
     protected static $defaultName = 'campaign/schedule';
 
     /**
-     * @param SendingService $sendingService
      * @param CampaignRepository $campaignRepo
+     * @param MessageBusInterface $messageBus
      */
     public function __construct(
-        private SendingService $sendingService,
-        private CampaignRepository $campaignRepo
+        private CampaignRepository $campaignRepo,
+        private MessageBusInterface $messageBus
     ) {
         parent::__construct();
     }
@@ -78,7 +79,11 @@ class ScheduleCommand extends Command
 
         foreach ($query->getIterator() as $campaign) {
             $io->info(sprintf('Processing campaign nr. %d [%d]', ++$cnt, $campaign->getId()));
-            $this->sendingService->sendQueue($campaign);
+
+            $this->messageBus->dispatch(
+                new SendCampaign($campaign),
+                []
+            );
         }
 
         return ExitCode::OK;

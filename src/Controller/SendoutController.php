@@ -22,6 +22,7 @@ use Mailery\Channel\Model\ChannelTypeList;
 use Yiisoft\Router\CurrentRoute;
 use Yiisoft\DataResponse\DataResponseFactoryInterface;
 use Yiisoft\DataResponse\Formatter\JsonDataResponseFormatter;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class SendoutController
 {
@@ -32,6 +33,7 @@ class SendoutController
      * @param DataResponseFactoryInterface $dataResponseFactory
      * @param CampaignRepository $campaignRepo
      * @param SendingService $sendingService
+     * @param MessageBusInterface $messageBus
      * @param BrandLocatorInterface $brandLocator
      */
     public function __construct(
@@ -41,6 +43,7 @@ class SendoutController
         private DataResponseFactoryInterface $dataResponseFactory,
         private CampaignRepository $campaignRepo,
         private SendingService $sendingService,
+        private MessageBusInterface $messageBus,
         BrandLocatorInterface $brandLocator
     ) {
         $this->viewRenderer = $viewRenderer
@@ -94,6 +97,15 @@ class SendoutController
 
         if ($request->getMethod() === Method::POST && $form->load($body) && $validator->validate($form)->isValid()) {
             try {
+                $envelope = $this->messageBus->dispatch(
+                    new SendCampaign($campaign),
+                    [
+//                        new TestIdentificatorsStamp(...$form->getIdentificators())
+                    ]
+                );
+
+                var_dump($envelope);exit;
+
                 $this->sendingService->sendTest($campaign, ...$form->getIdentificators());
 
                 $data = [
