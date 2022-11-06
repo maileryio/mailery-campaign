@@ -3,6 +3,7 @@
 namespace Mailery\Campaign\Messenger\Handler;
 
 use Mailery\Campaign\Messenger\Message\SendCampaign;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
 class SendCampaignHandler
 {
@@ -12,7 +13,9 @@ class SendCampaignHandler
      */
     public function __invoke(SendCampaign $sendCampaign)
     {
-        var_dump($sendCampaign);
+        echo $sendCampaign->getCampaignId();
+
+//        throw new \RuntimeException($sendCampaign->getCampaignId());
     }
 
 }

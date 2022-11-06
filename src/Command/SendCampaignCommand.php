@@ -4,7 +4,6 @@ namespace Mailery\Campaign\Command;
 
 use Mailery\Channel\Model\ChannelTypeList;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
-use Mailery\Campaign\Messenger\Stamp\IdentificatorsStamp;
 use Mailery\Campaign\Repository\CampaignRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

@@ -18,7 +18,7 @@ use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
 use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
-use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransport;
+use Mailery\Messenger\Transports\BeanstalkdTransportFactory;
 
 return [
     'maileryio/mailery-campaign' => [
@@ -42,7 +42,16 @@ return [
             SendCampaign::class => [SendCampaignHandler::class],
         ],
         'senders' => [
-            SendCampaign::class => [BeanstalkdTransport::class],
+            SendCampaign::class => ['sendout'],
+        ],
+        'transports' => [
+            'sendout' => DynamicReference::to(new BeanstalkdTransportFactory([
+                'tube_name' => 'sendout',
+                'retry_strategy' => [
+                    'max_retries' => 3,
+                    'delay' => 1000,
+                ],
+            ])),
         ],
     ],
 
