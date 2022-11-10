@@ -10,15 +10,17 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2020, Mailery (https://mailery.io/)
  */
 
-use Yiisoft\Router\UrlGeneratorInterface;
-use Yiisoft\Definitions\DynamicReference;
 use Mailery\Campaign\Command\ScheduleCampaignCommand;
 use Mailery\Campaign\Command\SendCampaignCommand;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
 use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
-use Mailery\Messenger\Transports\BeanstalkdTransportFactory;
+use Mailery\Messenger\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
+use Yiisoft\Definitions\DynamicReference;
+use Yiisoft\Definitions\Reference;
+use Yiisoft\Router\UrlGeneratorInterface;
 
 return [
     'maileryio/mailery-campaign' => [
@@ -44,14 +46,13 @@ return [
         'senders' => [
             SendCampaign::class => ['sendout'],
         ],
-        'transports' => [
-            'sendout' => DynamicReference::to(new BeanstalkdTransportFactory([
-                'tube_name' => 'sendout',
-                'retry_strategy' => [
-                    'max_retries' => 3,
-                    'delay' => 1000,
-                ],
-            ])),
+        'recievers' => [
+            'sendout' => [
+                'transport' => DynamicReference::to(new BeanstalkdTransportFactory([
+                    'tube_name' => 'sendout'
+                ])),
+                'retryStrategy' => Reference::to(MultiplierRetryStrategy::class),
+            ],
         ],
     ],
 

@@ -80,10 +80,7 @@ class ScheduleCampaignCommand extends Command
         foreach ($query->getIterator() as $campaign) {
             $io->info(sprintf('Processing campaign nr. %d [%d]', ++$cnt, $campaign->getId()));
 
-            $this->messageBus->dispatch(
-                new SendCampaign($campaign),
-                []
-            );
+            $this->messageBus->dispatch(new SendCampaign($campaign));
         }
 
         return ExitCode::OK;
