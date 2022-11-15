@@ -49,7 +49,7 @@ return [
         'recievers' => [
             'sendout' => [
                 'transport' => DynamicReference::to(new BeanstalkdTransportFactory([
-                    'tube_name' => 'sendout'
+                    'tube_name' => 'sendout',
                 ])),
                 'retryStrategy' => Reference::to(MultiplierRetryStrategy::class),
             ],

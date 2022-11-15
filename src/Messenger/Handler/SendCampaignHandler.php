@@ -15,7 +15,7 @@ class SendCampaignHandler
     {
         echo $sendCampaign->getCampaignId();
 
-        throw new \RuntimeException($sendCampaign->getCampaignId());
+        throw new \RuntimeException('Something happened');
     }
 
 }
