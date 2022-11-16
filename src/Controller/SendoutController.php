@@ -11,8 +11,14 @@ use Yiisoft\Http\Status;
 use Yiisoft\Http\Header;
 use Yiisoft\Router\UrlGeneratorInterface as UrlGenerator;
 use Mailery\Campaign\Form\SendTestForm;
-use Mailery\Campaign\Service\SendingService;
 use Mailery\Campaign\Repository\CampaignRepository;
+use Mailery\Campaign\Service\CampaignCrudService;
+use Mailery\Campaign\Service\SendoutCrudService;
+use Mailery\Campaign\Field\SendoutMode;
+use Mailery\Campaign\ValueObject\CampaignValueObject;
+use Mailery\Campaign\ValueObject\SendoutValueObject;
+use Mailery\Campaign\Messenger\Message\SendCampaign;
+use Mailery\Campaign\Messenger\Message\SendTestSendout;
 use Yiisoft\Yii\View\ViewRenderer;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
@@ -32,7 +38,8 @@ class SendoutController
      * @param UrlGenerator $urlGenerator
      * @param DataResponseFactoryInterface $dataResponseFactory
      * @param CampaignRepository $campaignRepo
-     * @param SendingService $sendingService
+     * @param CampaignCrudService $campaignCrudService
+     * @param SendoutCrudService $sendoutCrudService
      * @param MessageBusInterface $messageBus
      * @param BrandLocatorInterface $brandLocator
      */
@@ -42,7 +49,8 @@ class SendoutController
         private UrlGenerator $urlGenerator,
         private DataResponseFactoryInterface $dataResponseFactory,
         private CampaignRepository $campaignRepo,
-        private SendingService $sendingService,
+        private CampaignCrudService $campaignCrudService,
+        private SendoutCrudService $sendoutCrudService,
         private MessageBusInterface $messageBus,
         BrandLocatorInterface $brandLocator
     ) {
@@ -66,7 +74,20 @@ class SendoutController
         }
 
         if ($request->getMethod() === Method::POST) {
-            $this->sendingService->sendQueue($campaign);
+            $sendout = $this->sendoutCrudService->create(
+                (new SendoutValueObject())
+                    ->withMode(SendoutMode::asDefault())
+                    ->withCampaign($campaign)
+            );
+
+            $this->campaignCrudService->update(
+                $campaign,
+                CampaignValueObject::fromEntity($campaign)->asQueued()
+            );
+
+            $this->messageBus->dispatch(
+                (new SendCampaign($sendout->getId()))
+            );
         }
 
         return $this->responseFactory
@@ -96,21 +117,21 @@ class SendoutController
         $form = $form->withIdentificatorFactory($channelType->getIdentificatorFactory());
 
         if ($request->getMethod() === Method::POST && $form->load($body) && $validator->validate($form)->isValid()) {
+            $sendout = $this->sendoutCrudService->create(
+                (new SendoutValueObject())
+                    ->withMode(SendoutMode::asTest())
+                    ->withCampaign($campaign)
+            );
+
             try {
-                $envelope = $this->messageBus->dispatch(
-                    new SendCampaign($campaign),
-                    [
-//                        new TestIdentificatorsStamp(...$form->getIdentificators())
-                    ]
+                $this->messageBus->dispatch(
+                    (new SendTestSendout($sendout->getId()))
+                        ->withIdentificators(...$form->getIdentificators())
                 );
-
-                var_dump($envelope);exit;
-
-                $this->sendingService->sendTest($campaign, ...$form->getIdentificators());
 
                 $data = [
                     'success' => true,
-                    'message' => 'Test message have been sent!',
+                    'message' => 'Test message has been sent!',
                 ];
             } catch (\Exception $e) {
                 $sendout = $campaign->getLastTestSendout();

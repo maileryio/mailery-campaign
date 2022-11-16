@@ -15,7 +15,9 @@ use Mailery\Campaign\Command\SendCampaignCommand;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
+use Mailery\Campaign\Messenger\Message\SendTestSendout;
 use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
+use Mailery\Campaign\Messenger\Handler\SendTestSendoutHandler;
 use Mailery\Messenger\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Yiisoft\Definitions\DynamicReference;
@@ -42,14 +44,16 @@ return [
     'maileryio/mailery-messenger' => [
         'handlers' => [
             SendCampaign::class => [SendCampaignHandler::class],
+            SendTestSendout::class => [SendTestSendoutHandler::class],
         ],
         'senders' => [
-            SendCampaign::class => ['sendout'],
+            SendCampaign::class => ['campaign'],
+            SendTestSendout::class => ['sync'],
         ],
         'recievers' => [
-            'sendout' => [
+            'campaign' => [
                 'transport' => DynamicReference::to(new BeanstalkdTransportFactory([
-                    'tube_name' => 'sendout',
+                    'tube_name' => 'campaign',
                 ])),
                 'retryStrategy' => Reference::to(MultiplierRetryStrategy::class),
             ],

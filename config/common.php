@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\Recipient;
+use Mailery\Campaign\Entity\Sendout;
 use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Repository\CampaignRepository;
 use Mailery\Campaign\Repository\RecipientRepository;
-use Psr\Container\ContainerInterface;
+use Mailery\Campaign\Repository\SendoutRepository;
 use Cycle\ORM\ORMInterface;
 
 return [
@@ -17,15 +18,15 @@ return [
         ],
     ],
 
-    CampaignRepository::class => static function (ContainerInterface $container) {
-        return $container
-            ->get(ORMInterface::class)
-            ->getRepository(Campaign::class);
+    CampaignRepository::class => static function (ORMInterface $orm) {
+        return $orm->getRepository(Campaign::class);
     },
 
-    RecipientRepository::class => static function (ContainerInterface $container) {
-        return $container
-            ->get(ORMInterface::class)
-            ->getRepository(Recipient::class);
+    RecipientRepository::class => static function (ORMInterface $orm) {
+        return $orm->getRepository(Recipient::class);
+    },
+
+    SendoutRepository::class => static function (ORMInterface $orm) {
+        return $orm->getRepository(Sendout::class);
     },
 ];

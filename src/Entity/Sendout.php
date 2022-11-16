@@ -8,6 +8,7 @@ use Mailery\Activity\Log\Mapper\LoggableMapper;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Field\SendoutStatus;
 use Mailery\Campaign\Field\SendoutMode;
+use Mailery\Campaign\Repository\SendoutRepository;
 use Cycle\ORM\Collection\DoctrineCollectionFactory;
 use Cycle\Annotated\Annotation\Entity;
 use Cycle\Annotated\Annotation\Column;
@@ -18,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[Entity(
     table: 'sendouts',
+    repository: SendoutRepository::class,
     mapper: LoggableMapper::class,
 )]
 #[Behavior\CreatedAt(

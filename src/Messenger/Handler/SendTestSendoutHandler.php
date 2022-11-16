@@ -2,29 +2,32 @@
 
 namespace Mailery\Campaign\Messenger\Handler;
 
+use Mailery\Campaign\Entity\Recipient;
 use Mailery\Campaign\Entity\Sendout;
-use Mailery\Campaign\Messenger\Message\SendCampaign;
+use Mailery\Campaign\Messenger\Message\SendTestSendout;
 use Mailery\Campaign\Repository\SendoutRepository;
-use Mailery\Campaign\ValueObject\CampaignValueObject;
 use Mailery\Campaign\ValueObject\SendoutValueObject;
-use Mailery\Campaign\Service\CampaignCrudService;
 use Mailery\Campaign\Service\SendoutCrudService;
 use Mailery\Channel\Model\ChannelTypeList;
 
-class SendCampaignHandler
+class SendTestSendoutHandler
 {
 
+    /**
+     * @param ChannelTypeList $channelTypeList
+     * @param SendoutRepository $sendoutRepo
+     * @param SendoutCrudService $sendoutCrudService
+     */
     public function __construct(
         private ChannelTypeList $channelTypeList,
         private SendoutRepository $sendoutRepo,
-        private CampaignCrudService $campaignCrudService,
         private SendoutCrudService $sendoutCrudService
     ) {}
 
     /**
-     * @param SendCampaign $message
+     * @param SendTestSendout $message
      */
-    public function __invoke(SendCampaign $message)
+    public function __invoke(SendTestSendout $message)
     {
         /** @var Sendout $sendout */
         $sendout = $this->sendoutRepo->findByPK($message->getSendoutId());
@@ -36,18 +39,15 @@ class SendCampaignHandler
         $campaign = $sendout->getCampaign();
 
         $sendoutValueObject = SendoutValueObject::fromEntity($sendout);
-        $campaignValueObject = CampaignValueObject::fromEntity($campaign);
 
         $this->sendoutCrudService->update($sendout, $sendoutValueObject->asPending());
-        $this->campaignCrudService->update($campaign, $campaignValueObject->asSending());
 
         try {
             $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
-            $handler = $channelType->getHandler()->withSuppressErrors(true);
+            $handler = $channelType->getHandler();
 
-            $recipientIterator = $channelType
-                ->getRecipientIterator()
-                ->appendGroups(...$campaign->getGroups()->toArray());
+            $recipientIterator = $channelType->getRecipientIterator()
+                ->appendIdentificators(...$message->getIdentificators());
 
             foreach ($recipientIterator as $recipient) {
                 /** @var Recipient $recipient */
@@ -59,10 +59,8 @@ class SendCampaignHandler
             }
 
             $this->sendoutCrudService->update($sendout, $sendoutValueObject->asFinished());
-            $this->campaignCrudService->update($campaign, $campaignValueObject->asSent());
         } catch(\Exception $e) {
             $this->sendoutCrudService->update($sendout, $sendoutValueObject->asErrored()->withError($e->getMessage()));
-            $this->campaignCrudService->update($campaign, $campaignValueObject->asErrored());
 
             throw $e;
         }

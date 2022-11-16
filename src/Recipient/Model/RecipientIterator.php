@@ -79,6 +79,10 @@ class RecipientIterator extends \AppendIterator
      */
     public function appendIdentificators(Identificator ...$identificators): self
     {
+        if (empty($identificators)) {
+            return $this;
+        }
+
         $this->append(new CallableIterator(
             new \ArrayIterator($identificators),
             function (Identificator $identificator) {
