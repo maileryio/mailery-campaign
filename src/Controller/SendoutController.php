@@ -18,7 +18,7 @@ use Mailery\Campaign\Field\SendoutMode;
 use Mailery\Campaign\ValueObject\CampaignValueObject;
 use Mailery\Campaign\ValueObject\SendoutValueObject;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
-use Mailery\Campaign\Messenger\Message\SendTestSendout;
+use Mailery\Campaign\Messenger\Message\SendCampaignTest;
 use Yiisoft\Yii\View\ViewRenderer;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseFactoryInterface as ResponseFactory;
@@ -125,7 +125,7 @@ class SendoutController
 
             try {
                 $this->messageBus->dispatch(
-                    (new SendTestSendout($sendout->getId()))
+                    (new SendCampaignTest($sendout->getId()))
                         ->withIdentificators(...$form->getIdentificators())
                 );
 

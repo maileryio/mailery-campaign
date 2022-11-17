@@ -4,7 +4,7 @@ namespace Mailery\Campaign\Messenger\Message;
 
 use Mailery\Campaign\Recipient\Model\IdentificatorInterface as Identificator;
 
-class SendTestSendout
+class SendCampaignTest
 {
 
     /**

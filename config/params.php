@@ -15,9 +15,9 @@ use Mailery\Campaign\Command\SendCampaignCommand;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Campaign\Entity\CampaignGroup;
 use Mailery\Campaign\Messenger\Message\SendCampaign;
-use Mailery\Campaign\Messenger\Message\SendTestSendout;
+use Mailery\Campaign\Messenger\Message\SendCampaignTest;
 use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
-use Mailery\Campaign\Messenger\Handler\SendTestSendoutHandler;
+use Mailery\Campaign\Messenger\Handler\SendCampaignTestHandler;
 use Mailery\Messenger\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Yiisoft\Definitions\DynamicReference;
@@ -44,11 +44,11 @@ return [
     'maileryio/mailery-messenger' => [
         'handlers' => [
             SendCampaign::class => [SendCampaignHandler::class],
-            SendTestSendout::class => [SendTestSendoutHandler::class],
+            SendCampaignTest::class => [SendCampaignTestHandler::class],
         ],
         'senders' => [
             SendCampaign::class => ['campaign'],
-            SendTestSendout::class => ['sync'],
+            SendCampaignTest::class => ['sync'],
         ],
         'recievers' => [
             'campaign' => [

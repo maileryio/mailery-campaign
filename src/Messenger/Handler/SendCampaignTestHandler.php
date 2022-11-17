@@ -4,13 +4,13 @@ namespace Mailery\Campaign\Messenger\Handler;
 
 use Mailery\Campaign\Entity\Recipient;
 use Mailery\Campaign\Entity\Sendout;
-use Mailery\Campaign\Messenger\Message\SendTestSendout;
+use Mailery\Campaign\Messenger\Message\SendCampaignTest;
 use Mailery\Campaign\Repository\SendoutRepository;
 use Mailery\Campaign\ValueObject\SendoutValueObject;
 use Mailery\Campaign\Service\SendoutCrudService;
 use Mailery\Channel\Model\ChannelTypeList;
 
-class SendTestSendoutHandler
+class SendCampaignTestHandler
 {
 
     /**
@@ -25,9 +25,9 @@ class SendTestSendoutHandler
     ) {}
 
     /**
-     * @param SendTestSendout $message
+     * @param SendCampaignTest $message
      */
-    public function __invoke(SendTestSendout $message)
+    public function __invoke(SendCampaignTest $message)
     {
         /** @var Sendout $sendout */
         $sendout = $this->sendoutRepo->findByPK($message->getSendoutId());

@@ -14,6 +14,12 @@ use Mailery\Channel\Model\ChannelTypeList;
 class SendCampaignHandler
 {
 
+    /**
+     * @param ChannelTypeList $channelTypeList
+     * @param SendoutRepository $sendoutRepo
+     * @param CampaignCrudService $campaignCrudService
+     * @param SendoutCrudService $sendoutCrudService
+     */
     public function __construct(
         private ChannelTypeList $channelTypeList,
         private SendoutRepository $sendoutRepo,
