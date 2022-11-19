@@ -4,6 +4,7 @@ use Mailery\Activity\Log\Widget\ActivityLogLink;
 use Mailery\Icon\Icon;
 use Mailery\Campaign\Entity\Campaign;
 use Mailery\Subscriber\Entity\Group;
+use Mailery\Web\Vue\Directive;
 use Mailery\Widget\Link\Link;
 use Mailery\Widget\Search\Widget\SearchWidget;
 use Yiisoft\Html\Html;
@@ -83,11 +84,20 @@ $this->setTitle('All campaigns');
                     ->columns([
                         [
                             'label()' => ['Name'],
-                            'value()' => [fn (Campaign $model) => Html::a($model->getName(), $url->generate($model->getViewRouteName(), $model->getViewRouteParams()))],
+                            'value()' => [static function (Campaign $model) use($url) {
+                                return Html::a(
+                                    Directive::pre($model->getName()),
+                                    $url->generate($model->getViewRouteName(), $model->getViewRouteParams())
+                                );
+                            }],
                         ],
                         [
                             'label()' => ['Status'],
-                            'value()' => [fn (Campaign $model) => '<span class="badge ' . $model->getStatus()->getCssClass() . '">' . $model->getStatus()->getLabel() . '</span>'],
+                            'value()' => [static function (Campaign $model) {
+                                return '<span class="badge ' . $model->getStatus()->getCssClass() . '">'
+                                    . Directive::pre($model->getStatus()->getLabel())
+                                    . '</span>';
+                            }],
                         ],
                         [
                             'label()' => ['Type'],
@@ -100,7 +110,7 @@ $this->setTitle('All campaigns');
                             'label()' => ['Sender'],
                             'value()' => [static function (Campaign $data) use ($url) {
                                 return Html::a(
-                                    $data->getSender()->getName(),
+                                    Directive::pre($data->getSender()->getName()),
                                     $url->generate($data->getSender()->getViewRouteName(), $data->getSender()->getViewRouteParams())
                                 );
                             }],
@@ -109,7 +119,7 @@ $this->setTitle('All campaigns');
                             'label()' => ['Template'],
                             'value()' => [static function (Campaign $data) use ($url) {
                                 return Html::a(
-                                    $data->getTemplate()->getName(),
+                                    Directive::pre($data->getTemplate()->getName()),
                                     $url->generate($data->getTemplate()->getViewRouteName(), $data->getTemplate()->getViewRouteParams())
                                 );
                             }],
@@ -122,7 +132,7 @@ $this->setTitle('All campaigns');
                                     array_map(
                                         function (Group $group) use($url) {
                                             return Html::a(
-                                                $group->getName(),
+                                                Directive::pre($group->getName()),
                                                 $url->generate($group->getViewRouteName(), $group->getViewRouteParams())
                                             );
                                         },
