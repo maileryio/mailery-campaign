@@ -32,6 +32,7 @@ use Mailery\Campaign\Field\SendingType;
 use Mailery\Campaign\Field\UtmTags;
 use Cycle\Annotated\Annotation\Inheritance\DiscriminatorColumn;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mailery\Campaign\Entity\PreviewRoutableEntityInterface;
 
 /**
 * This doc block required for STI/JTI
@@ -50,7 +51,7 @@ use Doctrine\Common\Collections\ArrayCollection;
     column: 'updated_at',
 )]
 #[DiscriminatorColumn(name: 'type')]
-abstract class Campaign
+abstract class Campaign implements PreviewRoutableEntityInterface
 {
     #[Column(type: 'primary')]
     protected int $id;
