@@ -49,6 +49,12 @@ class Recipient implements LoggableEntityInterface
     #[Column(type: 'string(255)', nullable: true)]
     private ?string $error = null;
 
+    #[Column(type: 'string(255)', nullable: true)]
+    private ?string $messageId = null;
+
+    #[Column(type: 'json', default: '[]')]
+    private string $messageContext;
+
     #[Column(type: 'boolean', default: false)]
     protected bool $sent = false;
 
@@ -194,6 +200,54 @@ class Recipient implements LoggableEntityInterface
     public function setError(string $error): self
     {
         $this->error = $error;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageId(): string
+    {
+        return $this->messageId;
+    }
+
+    /**
+     * @param string $messageId
+     * @return self
+     */
+    public function setMessageId(string $messageId): self
+    {
+        $this->messageId = $messageId;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessageContext(): array
+    {
+        $messageContext = json_decode($this->messageContext, true);
+        if (!is_array($messageContext)) {
+            return [];
+        }
+
+        return $messageContext;
+    }
+
+    /**
+     * @param array $messageContext
+     * @return self
+     */
+    public function setMessageContext(array $messageContext): self
+    {
+        $jsonString = json_encode($messageContext);
+        if ($jsonString === false) {
+            $jsonString = '[]';
+        }
+
+        $this->messageContext = $jsonString;
 
         return $this;
     }
