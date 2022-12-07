@@ -29,10 +29,6 @@ return [
         'types' => [],
     ],
 
-    'maileryio/mailery-security' => [
-        'encryptKey' => 'encryptKey',
-    ],
-
     'maileryio/mailery-activity-log' => [
         'entity-groups' => [
             'campaign' => [

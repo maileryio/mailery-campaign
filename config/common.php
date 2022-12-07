@@ -9,29 +9,25 @@ use Mailery\Campaign\Model\CampaignTypeList;
 use Mailery\Campaign\Repository\CampaignRepository;
 use Mailery\Campaign\Repository\RecipientRepository;
 use Mailery\Campaign\Repository\SendoutRepository;
-use Mailery\Campaign\Service\SecurityService;
-use Mailery\Campaign\Security\MappedSerializer;
 use Mailery\Campaign\Renderer\WrappedUrlGenerator;
 use Mailery\Campaign\Controller\GuestController;
+use Mailery\Security\Security;
+use Mailery\Security\MappedSerializer;
 use Cycle\ORM\ORMInterface;
 use Yiisoft\Definitions\DynamicReference;
 use Yiisoft\Router\UrlGeneratorInterface;
 
-$securitySerializeParamsMap = [
-    'recipientId' => 'r',
-    'subscriberId' => 's',
-];
+$fnSecurityFactory = static function (Security $security) {
+    return $security->withSerializer(new MappedSerializer([
+        'recipientId' => 'r',
+        'subscriberId' => 's',
+    ]));
+};
 
 return [
     CampaignTypeList::class => [
         '__construct()' => [
             'elements' => $params['maileryio/mailery-campaign']['types'],
-        ],
-    ],
-
-    SecurityService::class => [
-        '__construct()' => [
-            'encryptKey' => $params['maileryio/mailery-security']['encryptKey'],
         ],
     ],
 
@@ -51,17 +47,13 @@ return [
 
                 return $clonedUrlGenerator;
             }),
-            'securityService' => DynamicReference::to(static function (SecurityService $securityService) use($securitySerializeParamsMap) {
-                return $securityService->withSerializer(new MappedSerializer($securitySerializeParamsMap));
-            }),
+            'security' => DynamicReference::to($fnSecurityFactory),
         ],
     ],
 
     GuestController::class => [
         '__construct()' => [
-            'securityService' => DynamicReference::to(static function (SecurityService $securityService) use($securitySerializeParamsMap) {
-                return $securityService->withSerializer(new MappedSerializer($securitySerializeParamsMap));
-            }),
+            'security' => DynamicReference::to($fnSecurityFactory),
         ],
     ],
 

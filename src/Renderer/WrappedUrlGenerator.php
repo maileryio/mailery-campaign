@@ -3,7 +3,7 @@
 namespace Mailery\Campaign\Renderer;
 
 use Mailery\Campaign\Entity\Recipient;
-use Mailery\Campaign\Service\SecurityService;
+use Mailery\Security\Security;
 use Mailery\Subscriber\Entity\Subscriber;
 use Yiisoft\Router\UrlGeneratorInterface;
 
@@ -11,22 +11,22 @@ class WrappedUrlGenerator
 {
 
     /**
-     * @var Recipient
+     * @var Recipient|null
      */
-    private Recipient $recipient;
+    private ?Recipient $recipient = null;
 
     /**
-     * @var Subscriber
+     * @var Subscriber|null
      */
-    private Subscriber $subscriber;
+    private ?Subscriber $subscriber = null;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
-     * @param SecurityService $securityService
+     * @param Security $security
      */
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-        private SecurityService $securityService
+        private Security $security
     ) {}
 
     /**
@@ -54,14 +54,18 @@ class WrappedUrlGenerator
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getWebversion(): string
+    public function getWebversion(): ?string
     {
+        if ($this->recipient === null) {
+            return null;
+        }
+
         return $this->urlGenerator->generateAbsolute(
             '/campaign/guest/webversion',
             [
-                'hash' => $this->securityService->encrypt([
+                'hash' => $this->security->encrypt([
                     'recipientId' => $this->recipient->getId(),
                 ]),
             ]
@@ -69,18 +73,18 @@ class WrappedUrlGenerator
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSubscribe(): string
+    public function getSubscribe(): ?string
     {
         if ($this->subscriber === null) {
-            return '';
+            return null;
         }
 
         return $this->urlGenerator->generateAbsolute(
             '/campaign/guest/subscribe',
             [
-                'hash' => $this->securityService->encrypt([
+                'hash' => $this->security->encrypt([
                     'subscriberId' => $this->subscriber->getId(),
                 ]),
             ]
@@ -88,18 +92,18 @@ class WrappedUrlGenerator
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUnsubscribe(): string
+    public function getUnsubscribe(): ?string
     {
         if ($this->subscriber === null) {
-            return '';
+            return null;
         }
 
         return $this->urlGenerator->generateAbsolute(
             '/campaign/guest/unsubscribe',
             [
-                'hash' => $this->securityService->encrypt([
+                'hash' => $this->security->encrypt([
                     'subscriberId' => $this->subscriber->getId(),
                 ]),
             ]
