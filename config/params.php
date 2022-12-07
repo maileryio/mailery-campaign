@@ -20,8 +20,6 @@ use Mailery\Campaign\Messenger\Handler\SendCampaignHandler;
 use Mailery\Campaign\Messenger\Handler\SendCampaignTestHandler;
 use Mailery\Messenger\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
-use Symfony\Component\Mailer\Messenger\MessageHandler;
-use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Yiisoft\Definitions\DynamicReference;
 use Yiisoft\Definitions\Reference;
 use Yiisoft\Router\UrlGeneratorInterface;
@@ -29,6 +27,10 @@ use Yiisoft\Router\UrlGeneratorInterface;
 return [
     'maileryio/mailery-campaign' => [
         'types' => [],
+    ],
+
+    'maileryio/mailery-security' => [
+        'encryptKey' => 'encryptKey',
     ],
 
     'maileryio/mailery-activity-log' => [
