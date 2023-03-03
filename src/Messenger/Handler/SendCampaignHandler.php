@@ -41,34 +41,45 @@ class SendCampaignHandler
 
         $campaign = $sendout->getCampaign();
 
-        $sendoutValueObject = SendoutValueObject::fromEntity($sendout);
-        $campaignValueObject = CampaignValueObject::fromEntity($campaign);
+        $channelType = $this->channelTypeList
+            ->findByEntity($campaign->getSender()->getChannel());
 
-        $this->sendoutCrudService->update($sendout, $sendoutValueObject->asPending());
-        $this->campaignCrudService->update($campaign, $campaignValueObject->asSending());
+        $channelHandler = $channelType->getHandler()
+            ->withSuppressErrors(true);
+
+        $recipients = $channelType
+            ->getRecipientIterator()
+            ->appendGroups(...$campaign->getGroups()->toArray());
 
         try {
-            $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
-            $handler = $channelType->getHandler()->withSuppressErrors(true);
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->asPending()
+            );
+            $this->campaignCrudService->update(
+                $campaign,
+                CampaignValueObject::fromEntity($campaign)->asSending()
+            );
 
-            $recipientIterator = $channelType
-                ->getRecipientIterator()
-                ->appendGroups(...$campaign->getGroups()->toArray());
+            $channelHandler->handle($sendout, $recipients);
 
-            foreach ($recipientIterator as $recipient) {
-                /** @var Recipient $recipient */
-                if (!$recipient->canBeSend()) {
-                    continue;
-                }
-
-                $handler->handle($sendout, $recipient);
-            }
-
-            $this->sendoutCrudService->update($sendout, $sendoutValueObject->asFinished());
-            $this->campaignCrudService->update($campaign, $campaignValueObject->asSent());
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->asFinished()
+            );
+            $this->campaignCrudService->update(
+                $campaign,
+                CampaignValueObject::fromEntity($campaign)->asSent()
+            );
         } catch(\Exception $e) {
-            $this->sendoutCrudService->update($sendout, $sendoutValueObject->asErrored()->withError($e->getMessage()));
-            $this->campaignCrudService->update($campaign, $campaignValueObject->asErrored());
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->withError($e->getMessage())->asErrored()
+            );
+            $this->campaignCrudService->update(
+                $campaign,
+                CampaignValueObject::fromEntity($campaign)->asErrored()
+            );
 
             throw $e;
         }

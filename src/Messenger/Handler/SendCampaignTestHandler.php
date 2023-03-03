@@ -2,7 +2,6 @@
 
 namespace Mailery\Campaign\Messenger\Handler;
 
-use Mailery\Campaign\Entity\Recipient;
 use Mailery\Campaign\Entity\Sendout;
 use Mailery\Campaign\Messenger\Message\SendCampaignTest;
 use Mailery\Campaign\Repository\SendoutRepository;
@@ -36,31 +35,31 @@ class SendCampaignTestHandler
             throw new \RuntimeException('Not found sendout entity [' . $message->getSendoutId() . ']');
         }
 
-        $campaign = $sendout->getCampaign();
+        $channelType = $this->channelTypeList
+            ->findByEntity($sendout->getCampaign()->getSender()->getChannel());
 
-        $sendoutValueObject = SendoutValueObject::fromEntity($sendout);
+        $channelHandler = $channelType->getHandler();
 
-        $this->sendoutCrudService->update($sendout, $sendoutValueObject->asPending());
+        $recipients = $channelType->getRecipientIterator()
+            ->appendIdentificators(...$message->getIdentificators());
 
         try {
-            $channelType = $this->channelTypeList->findByEntity($campaign->getSender()->getChannel());
-            $handler = $channelType->getHandler();
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->asPending()
+            );
 
-            $recipientIterator = $channelType->getRecipientIterator()
-                ->appendIdentificators(...$message->getIdentificators());
+            $channelHandler->handle($sendout, $recipients);
 
-            foreach ($recipientIterator as $recipient) {
-                /** @var Recipient $recipient */
-                if (!$recipient->canBeSend()) {
-                    continue;
-                }
-
-                $handler->handle($sendout, $recipient);
-            }
-
-            $this->sendoutCrudService->update($sendout, $sendoutValueObject->asFinished());
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->asFinished()
+            );
         } catch(\Exception $e) {
-            $this->sendoutCrudService->update($sendout, $sendoutValueObject->asErrored()->withError($e->getMessage()));
+            $this->sendoutCrudService->update(
+                $sendout,
+                SendoutValueObject::fromEntity($sendout)->withError($e->getMessage())->asErrored()
+            );
 
             throw $e;
         }

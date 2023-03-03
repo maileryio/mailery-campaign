@@ -43,6 +43,8 @@ class CampaignCrudService
     {
         $campaign = $campaign
             ->setName($valueObject->getName())
+            ->setSender($valueObject->getSender())
+            ->setTemplate($valueObject->getTemplate())
             ->setStatus($valueObject->getStatus())
         ;
 
